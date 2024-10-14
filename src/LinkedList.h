@@ -15,10 +15,8 @@ struct Node
 template <typename T>
 class LinkedList
 {
-private:
-    Node<T> *head;
-
 public:
+    Node<T> *head;
     LinkedList();
     void append(T value);
     void prepend(T value);

@@ -6,6 +6,7 @@
 #include "FileInfo.h"
 #include "LinkedList.h"
 #include "LinkedList.cpp"
+#include "RelevanceFunction.cpp"
 
 using namespace std;
 
@@ -149,6 +150,11 @@ int main()
         }
     }
 
+    float score = getSearchRelevanceScore(fileInfos[1]);
+    cout << "Score for file 1: " << score << endl;
+
+    float score2 = getSearchRelevanceScore(fileInfos[2]);
+    cout << "Score for file 2: " << score2 << endl;
     delete[] fileInfos;
     return 0;
 }
