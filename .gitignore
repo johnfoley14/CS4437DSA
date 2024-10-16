@@ -2,6 +2,7 @@
 build/
 
 **/csvs/
+*.csv
 
 # Ignore compiled binaries
 *.o
