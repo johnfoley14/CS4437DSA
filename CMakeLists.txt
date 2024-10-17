@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.28.3)
 # Your project settings
 project(MyProject)
 
-# Specify C++ standard (if required)
+# Specify C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
 # Fetch GoogleTest
 include(FetchContent)
@@ -14,31 +14,44 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/google/googletest.git
   GIT_TAG        release-1.12.1  # Latest stable release as of Oct 2024
 )
-# Download and configure GoogleTest
 FetchContent_MakeAvailable(googletest)
 
-# Link GoogleTest to your project (for testing)
 enable_testing()
 
-# Automatically gather source files
-file(GLOB_RECURSE SOURCES
-    src/*.cpp  # All .cpp files in src directory and subdirectories
-    src/*.h    # All .h files in src directory and subdirectories
+# Automatically gather application source files (excluding the test files)
+file(GLOB_RECURSE APP_SOURCES
+    src/*.cpp
+    src/*.h
 )
 
 # Automatically gather test files
 file(GLOB_RECURSE TEST_SOURCES
-    tests/*.cpp  # All .cpp files in tests directory and subdirectories
+    tests/*.cpp
 )
 
-# Add your test files
-add_executable(ProjectTests ${SOURCES} ${TEST_SOURCES})
+# Create a library for shared code
+add_library(Lib ${APP_SOURCES})
 
-# Include the src/ directory where add.h is located
-target_include_directories(ProjectTests PRIVATE ${CMAKE_SOURCE_DIR}/src)
+# Include directories for the shared library
+target_include_directories(Lib PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
-# Link GoogleTest with your test executable
-target_link_libraries(ProjectTests gtest gtest_main)
+# Create the application target
+add_executable(App src/main.cpp)
+
+# Link the shared library with the application
+target_link_libraries(App PRIVATE Lib)
+
+# Create the test target
+add_executable(Tests ${TEST_SOURCES})
+
+# Include directories for the tests
+target_include_directories(Tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+# Link GoogleTest and the shared library with the test executable
+target_link_libraries(Tests PRIVATE gtest gtest_main Lib)
+
+# Ensure both executables use C++17
+set_target_properties(App Tests PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # Add tests to CTest
-add_test(NAME MyTestSuite COMMAND ProjectTests)
+add_test(NAME TestSuite COMMAND Tests)

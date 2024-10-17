@@ -25,4 +25,6 @@ public:
     ~LinkedList();
 };
 
+#include "LinkedList.tpp"
+
 #endif
