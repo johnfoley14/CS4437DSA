@@ -1,5 +1,5 @@
-#include "FileInfo.h"
-#include <cmath> // For abs()
+#include "RelevanceFunction.h"
+
 using namespace std;
 
 // gets the score of a word in a file. This is a precalculated score that is stored in the CSV index file
@@ -32,7 +32,7 @@ int calculateBonusMarks(int pos1, int pos2)
 // why is the ability to index a CSV file important?
 
 // take in a single file and return the fileInfo score for multiple words searched
-static float getSearchRelevanceScore(FileInfo fileInfos)
+float getSearchRelevanceScore(FileInfo fileInfos)
 {
     float totalScore = 0.0f;
     int totalBonusMarks = 0;

@@ -1,12 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <cstring>
-#include "FileInfo.h"
-#include "LinkedList.h"
-#include "LinkedList.cpp"
-#include "RelevanceFunction.cpp"
+#include "Parse.h"
 
 using namespace std;
 
