@@ -34,12 +34,14 @@ int main() {
         cout << "You selected 3" << endl;
         break;
       case '4':
-        cout << "You selected 4" << endl;
-        break;
+        cout << "Quitting program..." << endl;
+        quit = true;
+        continue;
       default:
         cout << "Invalid input, please structure your input as <Choice Number> "
                 "<List of optional args>";
     }
+    printChoices();
   }
   return 0;
 }
