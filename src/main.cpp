@@ -2,6 +2,7 @@
 
 #include "Parse.h"
 #include "ProcessInput.h"
+#include "IndexBooks.h"
 
 void printChoices() {
   cout << "Your choices are:\n\r"
@@ -25,10 +26,10 @@ int main() {
     switch (choice[0]) {
       case '1':
         cout << "You selected 1" << endl;
+        createCSVs();
         break;
       case '2':
         getKeywords(choice).display();
-        printChoices();
         break;
       case '3':
         cout << "You selected 3" << endl;
@@ -39,7 +40,7 @@ int main() {
         continue;
       default:
         cout << "Invalid input, please structure your input as <Choice Number> "
-                "<List of optional args>";
+                "<List of optional args>\r\n";
     }
     printChoices();
   }
