@@ -22,6 +22,8 @@ enable_testing()
 file(GLOB_RECURSE APP_SOURCES
     src/*.cpp
     src/*.h
+    lib/*.cpp
+    lib/*.h
 )
 
 # Automatically gather test files
