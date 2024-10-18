@@ -22,6 +22,7 @@ public:
     void prepend(T value);
     void deleteByValue(T value);
     void display();
+    T get(int index);
     ~LinkedList();
 };
 

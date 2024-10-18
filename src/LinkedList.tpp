@@ -31,6 +31,26 @@ void LinkedList<T>::append(T value)
     }
 }
 
+template <typename T>
+T LinkedList<T>::get(int index)
+{
+    Node<T> *temp = head;
+    int i = 0;
+    while (temp != nullptr && i < index)
+    {
+        temp = temp->next;
+        i++;
+    }
+
+    if (temp == nullptr)
+    {
+        cout << "Index out of bounds" << endl;
+        return T();
+    }
+
+    return temp->data;
+}
+
 // Prepend a node at the beginning
 template <typename T>
 void LinkedList<T>::prepend(T value)

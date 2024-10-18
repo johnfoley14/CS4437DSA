@@ -29,8 +29,6 @@ int calculateBonusMarks(int pos1, int pos2)
     return 0;
 }
 
-// why is the ability to index a CSV file important?
-
 // take in a single file and return the fileInfo score for multiple words searched
 float getSearchRelevanceScore(FileInfo fileInfos)
 {
