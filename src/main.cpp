@@ -1,32 +1,45 @@
+#include <string>
+
 #include "Parse.h"
+#include "ProcessInput.h"
 
-int main()
-{
-    // example usage to read data and store in FileInfo array where file info can be used to calulate max scores.
+void printChoices() {
+  cout << "Your choices are:\n\r"
+          "1 - Reload indexed books\n\r"
+          "2 <keywords> - Search for a book using a list of keywords\n\r"
+          "3 <word> - Autocomplete\n\r"
+          "4 - Quit\n\r"
+          "Please enter your choice:"
+       << endl;
+}
 
-    string words[] = {"animal", "dog"};
-    int length = 2;     // Number of words searched for
-    int fileCount = 10; // this should be the max number of files we have (ie biggest file ID)
+int main() {
+  string choice;
+  bool quit = false;
 
-    // Call the function to process CSV files and get the array of FileInfo
-    FileInfo *fileInfos = processCSVFiles(words, length, fileCount);
+  printChoices();
 
-    for (int i = 0; i < fileCount; ++i)
-    {
-        if (fileInfos[i].fileId != 0 || fileInfos[i].totalWords != 0)
-        {
-            cout << "File ID: " << fileInfos[i].fileId << "\n";
-            cout << "Total Words: " << fileInfos[i].totalWords << "\n";
-            cout << "WordInfo entries: \n";
-            fileInfos[i].words.display();
-        }
+  while (!quit) {
+    getline(cin, choice);
+
+    switch (choice[0]) {
+      case '1':
+        cout << "You selected 1" << endl;
+        break;
+      case '2':
+        getKeywords(choice).display();
+        printChoices();
+        break;
+      case '3':
+        cout << "You selected 3" << endl;
+        break;
+      case '4':
+        cout << "You selected 4" << endl;
+        break;
+      default:
+        cout << "Invalid input, please structure your input as <Choice Number> "
+                "<List of optional args>";
     }
-
-    float score = getSearchRelevanceScore(fileInfos[1]);
-    cout << "Score for file 1: " << score << endl;
-
-    float score2 = getSearchRelevanceScore(fileInfos[2]);
-    cout << "Score for file 2: " << score2 << endl;
-    delete[] fileInfos;
-    return 0;
+  }
+  return 0;
 }

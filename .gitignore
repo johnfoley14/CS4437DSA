@@ -3,6 +3,7 @@ build/
 
 **/csvs/
 *.csv
+books/
 
 # Ignore compiled binaries
 *.o
