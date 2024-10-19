@@ -78,3 +78,16 @@ TEST(SanitizeLineTest, OnlyDelimitersTest) {
 
     EXPECT_EQ(result, expected);
 }
+
+// Test case 7: String with only delimiters
+TEST(SanitizeLineTest, OnlyLettersAndNumbers) {
+    LinkedList<string> expected; // No elements
+    expected.append("hello");
+    expected.append("isnt");
+    expected.append("this");
+    expected.append("gr8");
+
+    LinkedList<string> result = sanitizeLine("hello! isn't this gr8");
+
+    EXPECT_EQ(result, expected);
+}
