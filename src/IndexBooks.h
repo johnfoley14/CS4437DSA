@@ -8,10 +8,8 @@
 #include <sstream>
 #include <string>
 
-using namespace std;
+#include "ProcessInput.h"
 
-string toLowerCase(const string &str);
-void removePunctuationUpdateMap(const string &str, map<string, int> &wordCount);
 void createCSVs();
 
 #endif
