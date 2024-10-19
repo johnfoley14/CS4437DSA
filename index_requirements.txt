@@ -1,0 +1,36 @@
+This is an explanation of what data is needed for the relevance functions
+
+1. getWordRelevanceScore():
+
+This function is used to precalculate a score for a word in a book when it is being loaded into the index. 
+Requires:
+- The amount of time the word appears in the book
+- The total amount of words in the book
+- The proportion of books that contain the books when this book is indexed
+
+Explanation: we want to precalculate a score for the word "apple" in the book "Alice in Wonderland". We want to know how apple appears 8 times, 
+the total amount of words in the book is 1000 and the the proportion of books that contain apple so far. For example when we index "Alice in Wonderland", 
+6 out of 23 books have had "apple". If we only used the total amount (23), then we would have to precalculate the score for all previously indexed books
+
+
+2. getSearchRelevanceScore():
+
+This function is used to calculate the relevance of a book once a search has been entered
+Requires:
+- An array of BookInfos, where bookInfo has a linked list called words
+- Words is a linked list of words in the query that are in the book, containing the precalculated score and positions array to calculate the final score for a book
+
+
+
+Indexing requirements:
+
+Word.csv (example Apple.csv, there should exist one for every token in our books)
+bookId, positions, count, precalculatedScore (possibly doesnt even need the count as were going to grab the precalculated score instead)
+
+BooksMetadata.csv (this is an optimization to avoid storing the totalWords for a Book in every Word.csv)
+bookId, bookName, totalWords
+
+WordsMetadata.csv (this will let us calculate the proportion of books that contain a word up until that point, which will allow us to calculate the precalculated score)
+word, filesContainingWord
+
+
