@@ -120,3 +120,34 @@ bool LinkedList<T>::operator==(const LinkedList<T> &other) const {
   // If one list is longer than the other
   return temp1 == nullptr && temp2 == nullptr;
 }
+
+// Iterator dereference operator (return reference to current node data)
+template <typename T>
+T &LinkedList<T>::Iterator::operator*() {
+  return current->data;
+}
+
+// Iterator pre-increment operator (move to next node)
+template <typename T>
+typename LinkedList<T>::Iterator &LinkedList<T>::Iterator::operator++() {
+  current = current->next;
+  return *this;
+}
+
+// Iterator comparison operator (check if two iterators are not equal)
+template <typename T>
+bool LinkedList<T>::Iterator::operator!=(const Iterator &other) const {
+  return current != other.current;
+}
+
+// Begin function: returns an iterator to the first node (head)
+template <typename T>
+typename LinkedList<T>::Iterator LinkedList<T>::begin() {
+  return Iterator(head);
+}
+
+// End function: returns an iterator to the end (nullptr)
+template <typename T>
+typename LinkedList<T>::Iterator LinkedList<T>::end() {
+  return Iterator(nullptr);
+}
