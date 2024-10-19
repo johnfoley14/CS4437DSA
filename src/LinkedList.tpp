@@ -127,3 +127,20 @@ LinkedList<T>::~LinkedList()
         delete temp;
     }
 }
+
+template <typename T>
+bool LinkedList<T>::operator==(const LinkedList<T>& other) const {
+    Node<T>* temp1 = head;
+    Node<T>* temp2 = other.head;
+
+    while (temp1 != nullptr && temp2 != nullptr) {
+        if (temp1->data != temp2->data) {
+            return false;
+        }
+        temp1 = temp1->next;
+        temp2 = temp2->next;
+    }
+
+    // If one list is longer than the other
+    return temp1 == nullptr && temp2 == nullptr;
+}
