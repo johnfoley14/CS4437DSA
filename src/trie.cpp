@@ -86,37 +86,20 @@ void findFileAndAddToTrie(TrieNode &root){
     DIR *dr = opendir("../index"); // directory stream
     struct dirent *en; // pointer to all info about file in *dr
     if (dr) {
-      while ((en = readdir(dr)) != NULL) {
-        //  cout<<" \n"<<en->d_name << endl; //print all directory name
-         if(string(en->d_name) == "." || string(en->d_name) == ".."){ // ignoring . and .. directory
+        while ((en = readdir(dr)) != NULL) {
+            if(string(en->d_name) == "." || string(en->d_name) == ".."){ // ignoring . and .. directory
             continue;
-         }
-            if (en->d_type == DT_DIR){
-                string subDirPath = string("../index/") + en->d_name; // eg ../index/a/
-                DIR *subDr = opendir(subDirPath.c_str()); //converting to string(C style)
-                if (subDr) {
-                    struct dirent *subEn;
-                    while ((subEn = readdir(subDr)) != NULL) {
-                        
-                        bool fileCSV = isCSV(subEn->d_name);
-                        if (fileCSV){
-                            // cout << "CSV: " << subEn->d_name << endl;
-                            addWordToTrie(&root, removeExtension(subEn->d_name));// add to trie
-
-                        }
-                    }
-                    closedir(subDr); // Close subdirectory
-                } else {
-                    cout << "Failed to open subdirectory: " << en->d_name << endl;
+        }
+        else{
+            // process all csv in index directory
+            while ((en = readdir(dr)) != NULL) {
+                bool fileCSV = isCSV(en->d_name);
+                if (fileCSV){
+                    cout << "CSV: " << en->d_name << endl;
+                    addWordToTrie(&root, removeExtension(en->d_name));// add to trie
                 }
             }
-            
-            else { // Check if it's a file in the root directory
-                if (isCSV(en->d_name)){
-                    cout << "Log: CSV file in root: " << en->d_name << endl;
-                    addWordToTrie(&root, en->d_name);
-                }
-         }
+        }
       }
       closedir(dr); //close all directory
    }
@@ -125,13 +108,3 @@ void findFileAndAddToTrie(TrieNode &root){
    }
 }
 
-// int main(){
-//     TrieNode* root = new TrieNode();
-//     findFileAndAddToTrie(*root);
-
-//     // Get all file names
-//     vector<string> ans = searchTrie(root, "an");
-//     for (string s : ans) {
-//         cout << s << endl;
-//     }
-// }
