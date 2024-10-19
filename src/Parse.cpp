@@ -18,12 +18,12 @@ int *parsePositions(const string &posStr, int count)
     return positions;
 }
 
-// Main function that allocates FileInfo array and updates the fileInfo with CSV data
-FileInfo *processCSVFiles(const string *words, int length, int fileCount)
+// Main function that allocates BookInfo array and updates the BookInfo with CSV data
+BookInfo *processCSVFiles(const string *words, int length, int fileCount)
 {
-    // allocate array of FileInfo, where the array size is the max number of files we have
+    // allocate array of BookInfo, where the array size is the max number of files we have
     // the fileID will be used as the index in the array
-    FileInfo *fileInfos = new FileInfo[fileCount];
+    BookInfo *bookInfos = new BookInfo[fileCount];
 
     // loop through the list of words searched for
     for (int i = 0; i < length; ++i)
@@ -105,11 +105,11 @@ FileInfo *processCSVFiles(const string *words, int length, int fileCount)
 
             if (fileId >= 0 && fileId < fileCount)
             {
-                fileInfos[fileId].fileId = fileId;
-                fileInfos[fileId].totalWords = totalWords;
+                bookInfos[fileId].fileId = fileId;
+                bookInfos[fileId].totalWords = totalWords;
 
                 WordInfo wordInfo(count, 0.0f, positions); // Assuming score is 0.0, NOTE to talk with team about this to have precalculated score in CSV and parsed also
-                fileInfos[fileId].words.append(wordInfo);
+                bookInfos[fileId].words.append(wordInfo);
             }
 
             delete[] positions;
@@ -117,5 +117,5 @@ FileInfo *processCSVFiles(const string *words, int length, int fileCount)
 
         file.close(); // Close the file after reading
     }
-    return fileInfos;
+    return bookInfos;
 }

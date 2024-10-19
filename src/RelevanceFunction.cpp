@@ -29,14 +29,14 @@ int calculateBonusMarks(int pos1, int pos2)
     return 0;
 }
 
-// take in a single file and return the fileInfo score for multiple words searched
-float getSearchRelevanceScore(FileInfo fileInfos)
+// take in a single file and return the bookInfo score for multiple words searched
+float getSearchRelevanceScore(BookInfo bookInfos)
 {
     float totalScore = 0.0f;
     int totalBonusMarks = 0;
 
-    // Retrieve the list of WordInfo from fileInfos
-    LinkedList<WordInfo> &words = fileInfos.words;
+    // Retrieve the list of WordInfo from bookInfos
+    LinkedList<WordInfo> &words = bookInfos.words;
 
     Node<WordInfo> *word1Node = words.head;
 

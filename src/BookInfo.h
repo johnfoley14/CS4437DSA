@@ -1,5 +1,5 @@
-#ifndef FILEINFO_H
-#define FILEINFO_H
+#ifndef BookInfo_H
+#define BookInfo_H
 
 #include "LinkedList.h" // Include the LinkedList template class
 
@@ -100,16 +100,16 @@ struct WordInfo
     }
 };
 
-// FileInfo structure
+// BookInfo structure
 // This structure will be passed into our ranking function to calculate the score for a file based on the search query
-// For example if the search is "tall crazy cow", then fileInfo will have WordInfo objects if this file contains any of these words
-struct FileInfo
+// For example if the search is "tall crazy cow", then BookInfo will have WordInfo objects if this file contains any of these words
+struct BookInfo
 {
     int fileId;                 // Unique ID for the file
     int totalWords;             // Total number of words in the file
     LinkedList<WordInfo> words; // LinkedList of WordInfo for each word searched for. Each node will include data of the word information for this file
 
-    FileInfo(int id = 0, int total = 0)
+    BookInfo(int id = 0, int total = 0)
         : fileId(id), totalWords(total) {}
 };
 
