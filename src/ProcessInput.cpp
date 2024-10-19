@@ -14,7 +14,7 @@ LinkedList<string> sanitizeLine(string str) {
         currentWord.clear();
       }
     } else {
-      currentWord += ch;
+      currentWord += tolower(ch);
     }
   }
 
