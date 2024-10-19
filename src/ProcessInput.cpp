@@ -5,7 +5,6 @@ LinkedList<string> sanitizeLine(string str) {
   LinkedList<string> result;
 
   string currentWord = "";
-  cout << str << endl;
 
   for (char ch : str) {
     if (delimiters.find(ch) != string::npos) {
