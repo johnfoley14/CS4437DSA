@@ -6,6 +6,6 @@
 
 #include "LinkedList.h"
 
-LinkedList<string> getKeywords(string argString);
+LinkedList<string> sanitizeLine(string str);
 
 #endif

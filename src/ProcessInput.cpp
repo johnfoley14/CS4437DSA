@@ -1,19 +1,26 @@
 #include "ProcessInput.h"
 
-LinkedList<string> getKeywords(string argString) {
-  LinkedList<string> output;
-  string currentWord = "";
+LinkedList<string> sanitizeLine(string str) {
+  string delimiters = " -—";
+  LinkedList<string> result;
 
-  for (int i = 1; i < argString.length(); i++) {
-    while (argString[i] != ' ' && i < argString.length()) {
-      if (isalnum(argString[i])) {
-        currentWord += argString[i];
+  string currentWord = "";
+  cout << str << endl;
+
+  for (char ch : str) {
+    if (delimiters.find(ch) != string::npos) {
+      if (!currentWord.empty()) {
+        result.append(currentWord);
+        currentWord.clear();
       }
-      i++;
+    } else {
+      currentWord += ch;
     }
-    output.append(currentWord);
-    currentWord = "";
   }
 
-  return output;
+  if (!currentWord.empty()) {
+    result.append(currentWord);
+  }
+
+  return result;
 }

@@ -29,7 +29,7 @@ int main() {
         createCSVs();
         break;
       case '2':
-        getKeywords(choice).display();
+        sanitizeLine(choice).display();
         break;
       case '3':
         cout << "You selected 3" << endl;
