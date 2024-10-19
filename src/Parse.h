@@ -6,11 +6,11 @@
 #include <sstream>
 #include <string>
 #include <cstring>
-#include "FileInfo.h"
+#include "BookInfo.h"
 #include "LinkedList.h"
 #include "RelevanceFunction.h"
 
 int *parsePositions(const string &posStr, int count);
-FileInfo *processCSVFiles(const string *words, int length, int fileCount);
+BookInfo *processCSVFiles(const string *words, int length, int fileCount);
 
 #endif

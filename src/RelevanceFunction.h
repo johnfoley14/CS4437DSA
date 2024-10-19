@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <cmath> // For abs()
-#include "FileInfo.h"
+#include "BookInfo.h"
 #include "LinkedList.h"
 
 // Gets the word relevance score based on word count, total words in the file, and the number of files containing the word
@@ -13,6 +13,6 @@ static float getWordRelevanceScore(int wordCount, int totalWords, int filesConta
 int calculateBonusMarks(int pos1, int pos2);
 
 // Returns the search relevance score for the file based on multiple words searched and their positions
-float getSearchRelevanceScore(FileInfo fileInfos);
+float getSearchRelevanceScore(BookInfo bookInfos);
 
 #endif
