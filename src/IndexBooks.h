@@ -19,5 +19,7 @@ void appendToCSV(string filePath, string row);
 void indexAllBooks();
 void indexBook(string bookName);
 void updateWordCSVs(string bookId, map<string, int> wordCount);
+streampos getLastLineStartPos(string filePath);
+string readUntilComma(streampos linePos, string filePath);
 
 #endif

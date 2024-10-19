@@ -26,12 +26,12 @@ void clearScreen() {
 int main() {
   string choice;
   bool quit = false;
-  clearScreen();
+  // clearScreen();
 
   while (!quit) {
     printChoices();
     getline(cin, choice);
-    clearScreen();
+    // clearScreen();
 
     switch (choice[0]) {
       case '1':

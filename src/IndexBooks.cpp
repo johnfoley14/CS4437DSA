@@ -11,7 +11,8 @@ pair<int, map<string, int>> countWordsInBook(string filePath) {
   string line, word;
   int totalCount = 0;
 
-  while (getline(file, line)) {
+  // Maxing to 10 words for testing
+  while (getline(file, line) && totalCount < 10) {
     LinkedList<string> words = sanitizeLine(line);
 
     // Read each word from the line
@@ -38,20 +39,20 @@ void appendToCSV(string filePath, string row) {
 }
 
 void updateWordCSVs(string bookId, map<string, int> wordCount) {
-  // For testing purposes
-  int count = 0;
   for (const auto& entry : wordCount) {
     string filePath = "../index/words/" + entry.first + ".csv";
     string row = bookId + "," + to_string(entry.second);
-    if (count < 10) {
-      count++;
-      appendToCSV(filePath, row);
-    }
+    appendToCSV(filePath, row);
   }
 }
 
 bool bookIsIndexed(string bookName) {
   const string filePath = "../index/BookMetadata.csv";
+
+  if (!fs::exists(filePath)) {
+    return false;
+  }
+
   ifstream ifile(filePath);
 
   if (!ifile.is_open()) {
@@ -61,10 +62,12 @@ bool bookIsIndexed(string bookName) {
 
   string line;
   string currentBookName;
+  string discard;
 
   while (getline(ifile, line)) {
     stringstream ss(line);
 
+    getline(ss, discard, ',');
     getline(ss, currentBookName, ',');
 
     if (currentBookName == bookName) {
@@ -77,38 +80,46 @@ bool bookIsIndexed(string bookName) {
   return false;
 }
 
-// Returns the id of the book being added, or "-1" if the book is already added
+string getLastLine(string filePath) {
+  ifstream file(filePath);
+
+  if (!file.is_open()) {
+    cerr << "Error opening file: " << filePath << endl;
+    return "";
+  }
+
+  file.seekg(0, ios::end);
+
+  streampos linePos = file.tellg();
+  linePos -= 1;
+  char ch;
+
+  while (linePos > 0) {
+    linePos -= 1;
+    file.seekg(linePos);
+    file.get(ch);
+
+    if (ch == '\n') {
+      linePos += 1;
+      break;
+    }
+  }
+
+  file.seekg(linePos);
+  string line;
+  getline(file, line);
+  return line;
+}
+
+// Returns the id of the book being added
 string appendToBookMetadata(string bookName, int totalWords) {
   const string filePath = "../index/BookMetadata.csv";
 
   if (fs::exists(filePath)) {
-    ifstream ifile(filePath);
-
-    if (!ifile.is_open()) {
-      cerr << "Failed to open 'BookMetadata.csv' for reading!" << endl;
-      return "";
-    }
-
-    string line;
-    string currentBookName;
+    string lastLine = getLastLine(filePath);
+    stringstream ss(lastLine);
     string lastId;
-    bool bookExists = false;
-
-    while (getline(ifile, line)) {
-      stringstream ss(line);
-
-      getline(ss, lastId, ',');
-      getline(ss, currentBookName, ',');
-
-      if (currentBookName == bookName) {
-        ifile.close();
-        return "-1";
-      }
-    }
-
-    ifile.close();
-
-    cout << "lastId: " << lastId << endl;
+    getline(ss, lastId, ',');
 
     string newId = to_string(stoi(lastId) + 1);
     string row = newId + ',' + bookName + ',' + to_string(totalWords);
@@ -116,14 +127,6 @@ string appendToBookMetadata(string bookName, int totalWords) {
 
     return newId;
   } else {
-    ofstream file(filePath, ios::app);
-
-    if (!file.is_open()) {
-      cerr << "Failed to open or create output csv for 'BookMetadata.csv'"
-           << endl;
-      return "";
-    }
-
     string row = "1," + bookName + ',' + to_string(totalWords);
     appendToCSV(filePath, row);
     return "1";
@@ -131,7 +134,7 @@ string appendToBookMetadata(string bookName, int totalWords) {
 }
 
 // Create the required directories if they don't exist
-void createDirs() {
+void createIndexDirs() {
   const string requiredPath = "../index/words/";
   if (!fs::exists(requiredPath)) {
     if (fs::create_directories(requiredPath)) {
@@ -143,35 +146,32 @@ void createDirs() {
 }
 
 void indexBook(string bookName) {
+  if (bookIsIndexed(bookName)) {
+    return;
+  }
+
   string path = "../books/" + bookName + ".txt";
+
   int totalWords;
   map<string, int> wordCounts;
   tie(totalWords, wordCounts) = countWordsInBook(path);
 
   string bookId = appendToBookMetadata(bookName, totalWords);
+  updateWordCSVs(bookId, wordCounts);
 
-  cout << bookId << endl;
-  if (bookId != "-1") {
-    updateWordCSVs(bookId, wordCounts);
-  }
+  cout << "Successfully indexed new book: " << bookName << endl;
 }
 
 void indexAllBooks() {
-  createDirs();
-  try {
-    if (!fs::exists("../books/")) {
-      cerr << "No books directory found!" << endl;
-      return;
-    }
+  createIndexDirs();
+  if (!fs::exists("../books/")) {
+    cerr << "No books directory found!" << endl;
+    return;
+  }
 
-    for (const auto& entry : fs::directory_iterator("../books/")) {
-      if (fs::is_regular_file(entry.status())) {
-        std::cout << entry.path().stem().string() << std::endl;
-      }
+  for (const auto& entry : fs::directory_iterator("../books/")) {
+    if (fs::is_regular_file(entry.status())) {
+      indexBook(entry.path().stem().string());
     }
-  } catch (const fs::filesystem_error& e) {
-    std::cerr << "Filesystem error: " << e.what() << std::endl;
-  } catch (const std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
   }
 }
