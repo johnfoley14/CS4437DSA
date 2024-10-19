@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup
 
 
 # Function to download books from the Gutenberg top 100 list and store each as a plain text file
-def download_gutenberg_books(folder_name="books", limit=10):
+def download_gutenberg_books(folder_name="../books", limit=10):
+    print("starting")
     # Create the "books" folder if it doesn't exist
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
@@ -12,6 +13,7 @@ def download_gutenberg_books(folder_name="books", limit=10):
     # URL of the top 100 books on Project Gutenberg
     top_books_url = 'https://www.gutenberg.org/browse/scores/top'
     response = requests.get(top_books_url)
+    print(response)
 
     # Parse the webpage content using BeautifulSoup
     soup = BeautifulSoup(response.content, 'html.parser')
@@ -19,16 +21,22 @@ def download_gutenberg_books(folder_name="books", limit=10):
     # Find all links to books (they usually follow this pattern)
     book_links = []
     for a_tag in soup.select('ol li a'):
+        print("Found a book on page")
+        print(a_tag['href'])
         if a_tag['href'].startswith('/ebooks/'):
             book_links.append('https://www.gutenberg.org' + a_tag['href'])
 
         if len(book_links) >= limit:
             break
+    print(book_links)
 
     # Download each book in plain text format and store directly in the "books" folder
     for book_link in book_links:
         book_page = requests.get(book_link)
+        print("got book")
+        print(book_page)
         book_soup = BeautifulSoup(book_page.content, 'html.parser')
+        print(book_soup.find_all('a', href=True))
 
         # Try to find the plain text link
         txt_link = None
@@ -48,6 +56,7 @@ def download_gutenberg_books(folder_name="books", limit=10):
             # Download the plain text file
             txt_response = requests.get(txt_link)
             txt_file_path = os.path.join(folder_name, f"{clean_book_title}_{book_id}.txt")
+            print(txt_file_path)
 
             # Save the text content to a file directly in the "books" folder
             try:
