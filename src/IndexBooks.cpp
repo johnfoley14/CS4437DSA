@@ -8,14 +8,36 @@ string toLowerCase(const string &str) {
   return result;
 }
 
-string removePunctuation(const string &str) {
-  string result;
-  for (char ch : str) {
-    if (isalnum(ch) || ch == '\'') {
-      result += ch;
+void removePunctuationUpdateMap(const string &str, map<string, int> &wordCount) {
+    string result;
+
+    for (size_t i = 0; i < str.length(); ++i) {
+        char ch = str[i];
+
+        // alpha chars and apostrophes eg. "it's" -> "its"
+        if (isalpha(ch) || ch == '\'') {
+            result += ch;
+        }
+        // hyphens eg. "high-powered rocketry", as 3 different words
+        else if (ch == '-') {
+            if (!result.empty()) {
+                wordCount[toLowerCase(result)]++;  // incrementing or adding for the first time
+                result = "";
+            }
+        }
+        // end of word ".", "!", "?", ",", ";" etc
+        else {
+            if (!result.empty()) {
+                wordCount[toLowerCase(result)]++;  
+                result = "";  
+            }
+        }
     }
-  }
-  return result;
+
+    // adding word after last alpha char
+    if (!result.empty()) {
+        wordCount[toLowerCase(result)]++;
+    }
 }
 
 void createCSVs() {
@@ -35,12 +57,9 @@ void createCSVs() {
     // Read each word from the line
     while (ss >> word) {
       // Clean up the word by converting to lowercase and removing punctuation
-      word = removePunctuation(toLowerCase(word));
+      removePunctuationUpdateMap(toLowerCase(word), wordCount);
 
-      // Skip empty words (if any)
-      if (!word.empty()) {
-        ++wordCount[word];  // Increment word count
-      }
+    
     }
   }
 
@@ -49,7 +68,15 @@ void createCSVs() {
 
   // Output the word frequency
   std::cout << "Word Frequencies:" << std::endl;
-  for (const auto &entry : wordCount) {
-    std::cout << entry.first << ": " << entry.second << std::endl;
+  // For testing purposes - DELETE ME
+  ofstream out("../count_book.txt");
+  if (!out.is_open()) {
+      cerr << "Failed to open output file." << endl;
+      return;
   }
+  for (const auto &entry : wordCount) {
+      out << entry.first << ": " << entry.second << endl;
+      std::cout << entry.first << ": " << entry.second << std::endl;
+  }
+  out.close();
 }
