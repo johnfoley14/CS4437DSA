@@ -9,7 +9,7 @@
 
 struct TrieNode {
     char letter;
-    TrieNode* children[26];
+    TrieNode* children[36]; // 26 letters + 10 digits
     bool isLeaf;
 
     TrieNode(); 
@@ -24,5 +24,6 @@ TrieNode* findNode(TrieNode* root, const std::string& partial);
 void findWords(TrieNode* node, const std::string& partial, DynamicArray<std::string>& words);
 DynamicArray<std::string> searchTrie(TrieNode* root, const std::string& partial);
 void findFileAndAddToTrie(TrieNode &root);
+int getCharIndex(char c);
 
 #endif 
