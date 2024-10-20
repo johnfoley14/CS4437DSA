@@ -12,7 +12,7 @@ pair<int, map<string, int>> countWordsInBook(string filePath) {
   int totalCount = 0;
 
   // Maxing to 10 words for testing
-  while (getline(file, line) && totalCount < 10) {
+  while (getline(file, line)) {
     LinkedList<string> words = sanitizeLine(line);
 
     // Read each word from the line
@@ -89,11 +89,12 @@ void addPreviousRows(string filePath, string bookId) {
 void updateWordCSVs(string bookId, map<string, int> wordCount) {
   for (const auto& entry : wordCount) {
     string filePath = "../index/words/" + entry.first + ".csv";
-    string row = bookId + "," + to_string(entry.second);
+    
     if (bookId != "1") {
-      cout << "Book id: " << bookId << endl;
       addPreviousRows(filePath, bookId);
     }
+
+    string row = bookId + "," + to_string(entry.second);
     appendToCSV(filePath, row);
   }
 
@@ -170,7 +171,7 @@ void createIndexDirs() {
     if (fs::create_directories(requiredPath)) {
       cout << "Created required directories!" << endl;
     } else {
-      cout << "Failed to create required directories!" << endl;
+      cerr << "Failed to create required directories!" << endl;
     }
   }
 }
