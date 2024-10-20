@@ -24,10 +24,17 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
     // allocate array of BookInfo, where the array size is the max number of files we have
     // the fileID will be used as the index in the array
     BookInfo *bookInfos = new BookInfo[fileCount + 1];
+    bool notFlag = false;
 
     // loop through the list of words searched for
     for (int i = 0; i < length; ++i)
     {
+        if (words[i] == "NOT")
+        {
+            notFlag = true;
+            continue;
+        }
+
         string filename = "../index/words/" + words[i] + ".csv";
         ifstream file(filename);
 
@@ -99,6 +106,12 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
             int fileId = stoi(fileIdStr);
             int count = stoi(countStr);
             int totalWords = stoi(totalWordsStr);
+            float score = 0.0; // Default score value for now, to be calculated later in the project
+            // if notFlag, it means we had NOT before this word in the search, so we want to negate the score so files with more of this word are ranked lower
+            if (notFlag)
+            {
+                score = -score;
+            }
 
             // Parse the positions string into an array of integers
             int *positions = parsePositions(positionsStr, count);
@@ -108,7 +121,7 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
                 bookInfos[fileId].fileId = fileId;
                 bookInfos[fileId].totalWords = totalWords;
 
-                WordInfo wordInfo(count, 0.0f, positions); // Assuming score is 0.0, NOTE to talk with team about this to have precalculated score in CSV and parsed also
+                WordInfo wordInfo(count, score, positions); // Assuming score is 0.0, NOTE to talk with team about this to have precalculated score in CSV and parsed also
                 bookInfos[fileId].words.append(wordInfo);
             }
 
@@ -116,6 +129,7 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
         }
 
         file.close(); // Close the file after reading
+        notFlag = false;
     }
     return bookInfos;
 }
