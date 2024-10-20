@@ -252,4 +252,5 @@ void indexAllBooks() {
       indexBook(entry.path().stem().string());
     }
   }
+  updateWordMetadata();
 }
