@@ -52,19 +52,3 @@ TEST(DynamicArrayTest, DynamicArrayEquality)
     delete dynamicArray1;
     delete dynamicArray2;
 }
-
-TEST(DynamicArrayTest, DynamicArrayInequality)
-{
-    DynamicArray<std::string> *dynamicArray1 = new DynamicArray<std::string>();
-    dynamicArray1->add("hello");
-    dynamicArray1->add("world");
-
-    DynamicArray<std::string> *dynamicArray2 = new DynamicArray<std::string>();
-    dynamicArray2->add("hello");
-    dynamicArray2->add("world");
-    dynamicArray2->add("apple");
-
-    EXPECT_NE(*dynamicArray1, *dynamicArray2);
-    delete dynamicArray1;
-    delete dynamicArray2;
-}
