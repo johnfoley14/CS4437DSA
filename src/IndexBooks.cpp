@@ -195,13 +195,23 @@ void updateWordMetadata() {
   if (fs::exists("../index/WordMetadata.csv")) {
     fs::remove("../index/WordMetadata.csv");
   }
-  cout << "AAAAAAAAAAAAAAHHHHHHHHHHHHHHHH" << endl;
 
   for (const auto& entry : fs::directory_iterator("../index/words/")) {
     if (fs::is_regular_file(entry.status())) {
       int booksContainingWord = countBooksWithWord(entry.path());
       string row =
           entry.path().stem().string() + ',' + to_string(booksContainingWord);
+
+      appendToCSV("../index/WordsMetadata.csv", row);
+    }
+  }
+}
+
+void addRelevanceScores() {
+  for (const auto& entry : fs::directory_iterator("../index/words/")) {
+    if (fs::is_regular_file(entry.status())) {
+      int booksContainingWord = countBooksWithWord(entry.path());
+      string row;
 
       ifstream wordFile(entry.path());
       ifstream bookFile("../index/BookMetadata.csv");
@@ -228,19 +238,21 @@ void updateWordMetadata() {
           int countInBook = stoi(totalInBook);
           float relevance =
               getWordRelevanceScore(count, countInBook, booksContainingWord);
-          row += ',' + to_string(relevance);
+          row = to_string(relevance);
         } else {
-          row += ',';
+          row = "";
         }
+
+        appendToCSV("../index/scores/" + entry.path().stem().string() + ".csv",
+                    row);
       }
-      appendToCSV("../index/WordsMetadata.csv", row);
     }
   }
 }
 
 // Create the required directories if they don't exist
 void createIndexDirs() {
-  const vector<string> requiredPaths = {"../index/words/"};
+  const vector<string> requiredPaths = {"../index/words/", "../index/scores/"};
 
   for (string path : requiredPaths) {
     if (!fs::exists(path)) {
@@ -283,4 +295,5 @@ void indexAllBooks() {
     }
   }
   updateWordMetadata();
+  addRelevanceScores();
 }
