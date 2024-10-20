@@ -289,11 +289,20 @@ void indexAllBooks() {
     return;
   }
 
+  int totalBooks = 0;
   for (const auto& entry : fs::directory_iterator("../books/")) {
     if (fs::is_regular_file(entry.status())) {
       indexBook(entry.path().stem().string());
+      totalBooks++;
     }
   }
+
+  if (fs::exists("../index/Overview.csv")) {
+    fs::remove("../index/Overview.csv");
+  }
+
+  string row = "totalBooks," + to_string(totalBooks);
+  appendToCSV("../index/Overview.csv", row);
   updateWordMetadata();
   addRelevanceScores();
 }
