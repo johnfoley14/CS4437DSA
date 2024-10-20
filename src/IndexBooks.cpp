@@ -94,7 +94,7 @@ void updateWordCSVs(string bookId, map<string, int> wordCount) {
       addPreviousRows(filePath, bookId);
     }
 
-    string row = bookId + "," + to_string(entry.second);
+    string row = bookId + ',' + to_string(entry.second);
     appendToCSV(filePath, row);
   }
 
@@ -107,6 +107,32 @@ void updateWordCSVs(string bookId, map<string, int> wordCount) {
       }
     }
   }
+}
+
+int countBooksWithWord(string filePath) {
+  int result = 0;
+  ifstream file(filePath);
+
+  if (!file.is_open()) {
+    cerr << "Error: Could not open the file:" << filePath << endl;
+    return 0;
+  }
+
+  string currentLine;
+
+  while (getline(file, currentLine)) {
+    stringstream ss(currentLine);
+    string currentWordCount;
+    string discard;
+
+    getline(ss, discard, ',');
+    getline(ss, currentWordCount, ',');
+
+    if (currentWordCount != "") {
+      result++;
+    }
+  }
+  return result;
 }
 
 bool bookIsIndexed(string bookName) {
@@ -165,60 +191,64 @@ string appendToBookMetadata(string bookName, int totalWords) {
   }
 }
 
-int countBooksWithWord(string filePath) {
-  int result = 0;
-  ifstream file(filePath);
-
-  if (!file.is_open()) {
-    cerr << "Error: Could not open the file:" << filePath << endl;
-    return 0;
-  }
-
-  string currentLine;
-  string currentWordCount;
-  string discard;
-
-  while (getline(file, currentLine)) {
-    stringstream ss(currentLine);
-
-    getline(ss, discard, ',');
-    getline(ss, currentWordCount, ',');
-
-    if (currentWordCount != "") {
-      result++;
-    }
-  }
-  return result;
-}
-
 void updateWordMetadata() {
-  map<string, int> bookCount;
-
-  for (const auto& entry : fs::directory_iterator("../index/words/")) {
-    if (fs::is_regular_file(entry.status())) {
-      fs::path currentPath = entry.path();
-      bookCount[currentPath.stem().string()] = countBooksWithWord(currentPath);
-    }
-  }
-
   if (fs::exists("../index/WordMetadata.csv")) {
     fs::remove("../index/WordMetadata.csv");
   }
+  cout << "AAAAAAAAAAAAAAHHHHHHHHHHHHHHHH" << endl;
 
-  for (const auto entry : bookCount) {
-    string row = entry.first + ',' + to_string(entry.second);
-    appendToCSV("../index/WordMetadata.csv", row);
+  for (const auto& entry : fs::directory_iterator("../index/words/")) {
+    if (fs::is_regular_file(entry.status())) {
+      int booksContainingWord = countBooksWithWord(entry.path());
+      string row =
+          entry.path().stem().string() + ',' + to_string(booksContainingWord);
+
+      ifstream wordFile(entry.path());
+      ifstream bookFile("../index/BookMetadata.csv");
+
+      string currentBook;
+      string totalInBook;
+      string currentLine;
+      string discard;
+      string countInBook;
+      while (getline(wordFile, currentLine)) {
+        getline(bookFile, currentBook);
+        stringstream ssBook(currentBook);
+        stringstream ssWord(currentLine);
+
+        getline(ssWord, discard, ',');  // Discard bookId
+        getline(ssWord, countInBook);
+
+        getline(ssBook, discard, ',');
+        getline(ssBook, discard, ',');
+        getline(ssBook, totalInBook);
+
+        if (countInBook != "") {
+          int count = stoi(countInBook);
+          int countInBook = stoi(totalInBook);
+          float relevance =
+              getWordRelevanceScore(count, countInBook, booksContainingWord);
+          row += ',' + to_string(relevance);
+        } else {
+          row += ',';
+        }
+      }
+      appendToCSV("../index/WordsMetadata.csv", row);
+    }
   }
 }
 
 // Create the required directories if they don't exist
 void createIndexDirs() {
-  const string requiredPath = "../index/words/";
-  if (!fs::exists(requiredPath)) {
-    if (fs::create_directories(requiredPath)) {
-      cout << "Created required directories!" << endl;
-    } else {
-      cerr << "Failed to create required directories!" << endl;
+  const vector<string> requiredPaths = {"../index/words/"};
+
+  for (string path : requiredPaths) {
+    if (!fs::exists(path)) {
+      if (fs::create_directories(path)) {
+        cout << "Created required directories: " << path << endl;
+      } else {
+        cerr << "Failed to create required directories!" << endl;
+      }
     }
   }
 }

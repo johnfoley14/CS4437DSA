@@ -10,6 +10,7 @@
 #include <string>
 
 #include "ProcessInput.h"
+#include "RelevanceFunction.h"
 
 namespace fs = filesystem;
 
