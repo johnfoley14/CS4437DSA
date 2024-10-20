@@ -37,7 +37,7 @@ void DynamicArray<T>::resize() {
 template <typename T>
 void DynamicArray<T>::printElements() const {
     for (int i = 0; i < size; i++) {
-        std::cout << data[i] << " ";
+        std::cout << data[i] << std::endl;
     }
     std::cout << std::endl;
 }

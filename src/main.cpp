@@ -4,6 +4,7 @@
 #include "IndexBooks.h"
 #include "Parse.h"
 #include "ProcessInput.h"
+#include "trie.h"
 
 void printChoices() {
   cout << "Your choices are:\n\r"
@@ -25,6 +26,7 @@ void clearScreen() {
 
 int main() {
   string choice;
+  TrieNode root;
   bool quit = false;
   // clearScreen();
 
@@ -37,13 +39,29 @@ int main() {
       case '1':
         cout << "You selected: 1 - Reload indexed books" << endl;
         indexAllBooks();
+        findFileAndAddToTrie(root);
         break;
       case '2':
         sanitizeLine(choice).display();
         break;
-      case '3':
-        cout << "You selected 3" << endl;
+      case '3':{
+        cout << "You selected 3 - Auto complete" << endl;
+        if (choice.length() <= 2) {
+            cout << "Please provide a word for autocomplete after '3'.\n";
+            break;
+        }
+
+        string word = choice.substr(2);
+        DynamicArray<std::string> suggestions = searchTrie(&root, word);
+
+        if (suggestions.getSize() == 0) {
+            cout << "No suggestions found for: " << word << endl;
+        } else {
+            cout << "Autocomplete words for '" << word << "':" << endl;
+            suggestions.printElements();
+        }
         break;
+      }
       case '4':
         cout << "Quitting program..." << endl;
         quit = true;
