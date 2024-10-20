@@ -12,7 +12,7 @@ pair<int, map<string, int>> countWordsInBook(string filePath) {
   int totalCount = 0;
 
   // Maxing to 10 words for testing
-  while (getline(file, line)) {
+  while (getline(file, line) && totalCount < 10) {
     LinkedList<string> words = sanitizeLine(line);
 
     // Read each word from the line
@@ -71,7 +71,7 @@ string getLastLine(string filePath) {
 
 void addPreviousRows(string filePath, string bookId) {
   int lastId = 0;
-  
+
   if (fs::exists(filePath)) {
     string lastLine = getLastLine(filePath);
     stringstream ss(lastLine);
@@ -89,7 +89,7 @@ void addPreviousRows(string filePath, string bookId) {
 void updateWordCSVs(string bookId, map<string, int> wordCount) {
   for (const auto& entry : wordCount) {
     string filePath = "../index/words/" + entry.first + ".csv";
-    
+
     if (bookId != "1") {
       addPreviousRows(filePath, bookId);
     }
@@ -98,6 +98,7 @@ void updateWordCSVs(string bookId, map<string, int> wordCount) {
     appendToCSV(filePath, row);
   }
 
+  // Add book to word csvs that the book didn't have
   string emptyRow = bookId + ',';
   for (const auto& entry : fs::directory_iterator("../index/words/")) {
     if (fs::is_regular_file(entry.status())) {
@@ -164,6 +165,52 @@ string appendToBookMetadata(string bookName, int totalWords) {
   }
 }
 
+int countBooksWithWord(string filePath) {
+  int result = 0;
+  ifstream file(filePath);
+
+  if (!file.is_open()) {
+    cerr << "Error: Could not open the file:" << filePath << endl;
+    return 0;
+  }
+
+  string currentLine;
+  string currentWordCount;
+  string discard;
+
+  while (getline(file, currentLine)) {
+    stringstream ss(currentLine);
+
+    getline(ss, discard, ',');
+    getline(ss, currentWordCount, ',');
+
+    if (currentWordCount != "") {
+      result++;
+    }
+  }
+  return result;
+}
+
+void updateWordMetadata() {
+  map<string, int> bookCount;
+
+  for (const auto& entry : fs::directory_iterator("../index/words/")) {
+    if (fs::is_regular_file(entry.status())) {
+      fs::path currentPath = entry.path();
+      bookCount[currentPath.stem().string()] = countBooksWithWord(currentPath);
+    }
+  }
+
+  if (fs::exists("../index/WordMetadata.csv")) {
+    fs::remove("../index/WordMetadata.csv");
+  }
+
+  for (const auto entry : bookCount) {
+    string row = entry.first + ',' + to_string(entry.second);
+    appendToCSV("../index/WordMetadata.csv", row);
+  }
+}
+
 // Create the required directories if they don't exist
 void createIndexDirs() {
   const string requiredPath = "../index/words/";
@@ -205,4 +252,5 @@ void indexAllBooks() {
       indexBook(entry.path().stem().string());
     }
   }
+  updateWordMetadata();
 }
