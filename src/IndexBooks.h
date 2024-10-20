@@ -2,9 +2,9 @@
 #define INDEXBOOKS_H
 
 #include <cctype>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <filesystem>
 #include <map>
 #include <sstream>
 #include <string>
@@ -14,7 +14,17 @@
 
 namespace fs = filesystem;
 
-pair<int, map<string, int>> countWordsInBook(string filePath);
+struct WordMetadata {
+    int count;
+    std::vector<int> positions;
+};
+
+struct WordsInBook {
+  int totalWords;
+  map<string, WordMetadata> data;
+};
+
+WordsInBook countWordsInBook(string filePath);
 string appendToBookMetadata(string bookName, int totalWords);
 void appendToCSV(string filePath, string row);
 void indexAllBooks();
