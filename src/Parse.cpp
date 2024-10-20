@@ -28,7 +28,7 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
     // loop through the list of words searched for
     for (int i = 0; i < length; ++i)
     {
-        string filename = "../index/" + words[i] + ".csv";
+        string filename = "../index/words/" + words[i] + ".csv";
         ifstream file(filename);
 
         if (!file.is_open())
