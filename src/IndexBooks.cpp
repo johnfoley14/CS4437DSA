@@ -38,11 +38,72 @@ void appendToCSV(string filePath, string row) {
   file.close();
 }
 
+string getLastLine(string filePath) {
+  ifstream file(filePath);
+
+  if (!file.is_open()) {
+    cerr << "Error opening file: " << filePath << endl;
+    return "";
+  }
+
+  file.seekg(0, ios::end);
+
+  streampos linePos = file.tellg();
+  linePos -= 1;
+  char ch;
+
+  while (linePos > 0) {
+    linePos -= 1;
+    file.seekg(linePos);
+    file.get(ch);
+
+    if (ch == '\n') {
+      linePos += 1;
+      break;
+    }
+  }
+
+  file.seekg(linePos);
+  string line;
+  getline(file, line);
+  return line;
+}
+
+void addPreviousRows(string filePath, string bookId) {
+  int lastId = 0;
+  
+  if (fs::exists(filePath)) {
+    string lastLine = getLastLine(filePath);
+    stringstream ss(lastLine);
+    string lastIdStr;
+    getline(ss, lastIdStr, ',');
+    lastId = stoi(lastIdStr);
+  }
+
+  for (int i = lastId + 1; i < stoi(bookId); i++) {
+    string emptyRow = to_string(i) + ',';
+    appendToCSV(filePath, emptyRow);
+  }
+}
+
 void updateWordCSVs(string bookId, map<string, int> wordCount) {
   for (const auto& entry : wordCount) {
     string filePath = "../index/words/" + entry.first + ".csv";
     string row = bookId + "," + to_string(entry.second);
+    if (bookId != "1") {
+      cout << "Book id: " << bookId << endl;
+      addPreviousRows(filePath, bookId);
+    }
     appendToCSV(filePath, row);
+  }
+
+  string emptyRow = bookId + ',';
+  for (const auto& entry : fs::directory_iterator("../index/words/")) {
+    if (fs::is_regular_file(entry.status())) {
+      if (wordCount.find(entry.path().stem().string()) == wordCount.end()) {
+        appendToCSV(entry.path(), emptyRow);
+      }
+    }
   }
 }
 
@@ -78,37 +139,6 @@ bool bookIsIndexed(string bookName) {
 
   ifile.close();
   return false;
-}
-
-string getLastLine(string filePath) {
-  ifstream file(filePath);
-
-  if (!file.is_open()) {
-    cerr << "Error opening file: " << filePath << endl;
-    return "";
-  }
-
-  file.seekg(0, ios::end);
-
-  streampos linePos = file.tellg();
-  linePos -= 1;
-  char ch;
-
-  while (linePos > 0) {
-    linePos -= 1;
-    file.seekg(linePos);
-    file.get(ch);
-
-    if (ch == '\n') {
-      linePos += 1;
-      break;
-    }
-  }
-
-  file.seekg(linePos);
-  string line;
-  getline(file, line);
-  return line;
 }
 
 // Returns the id of the book being added
