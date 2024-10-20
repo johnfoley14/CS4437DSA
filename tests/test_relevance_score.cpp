@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "BookInfo.h"
-#include "Parse.h"
+#include "HandleSearch.h"
 #include "RelevanceFunction.h"
 
 string words[] = {"test_dummy_data", "test_dummy_data2"};

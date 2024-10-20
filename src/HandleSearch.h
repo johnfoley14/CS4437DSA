@@ -1,5 +1,5 @@
-#ifndef PARSE_H
-#define PARSE_H
+#ifndef HANDLESEACRH_H
+#define HANDLESEARCH_H
 
 #include <iostream>
 #include <fstream>
@@ -12,5 +12,6 @@
 
 int *parsePositions(const string &posStr, int count);
 BookInfo *processCSVFiles(const string *words, int length, int fileCount);
+void handleSearch(string choice);
 
 #endif

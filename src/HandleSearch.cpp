@@ -1,4 +1,4 @@
-#include "Parse.h"
+#include "HandleSearch.h"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
 {
     // allocate array of BookInfo, where the array size is the max number of files we have
     // the fileID will be used as the index in the array
-    BookInfo *bookInfos = new BookInfo[fileCount];
+    BookInfo *bookInfos = new BookInfo[fileCount + 1];
 
     // loop through the list of words searched for
     for (int i = 0; i < length; ++i)
@@ -118,4 +118,46 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
         file.close(); // Close the file after reading
     }
     return bookInfos;
+}
+
+int countWords(const string &input)
+{
+    istringstream iss(input);
+    string word;
+    int wordCount = 0;
+
+    // Count words by reading from the input stream
+    while (iss >> word)
+    {
+        wordCount++;
+    }
+
+    // Subtract 1 to exclude the first word
+    return (wordCount > 0) ? wordCount - 1 : 0;
+}
+
+void splitStringIntoArray(const string &input, string *output, int wordCount)
+{
+    istringstream iss(input);
+    string word;
+    int index = 0;
+
+    // Skip the first word
+    iss >> word;
+
+    // Split the string by spaces and insert the remaining words into the array
+    while (iss >> word && index < wordCount)
+    {
+        output[index++] = word;
+    }
+}
+
+void handleSearch(string choice)
+{
+    int wordCount = countWords(choice);
+
+    string *output = new string[wordCount];
+    // split the searched string into an array of words
+    splitStringIntoArray(choice, output, wordCount);
+    BookInfo *searchBookInfos = processCSVFiles(output, wordCount, 1);
 }
