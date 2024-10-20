@@ -16,7 +16,10 @@ public:
     void add(const T &value);
     void resize();
     void printElements() const;
+    int getSize() const;
+    bool operator==(const DynamicArray<T>& other) const;
 };
 
+#include "DynamicArray.tpp"
 
 #endif 
