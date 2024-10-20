@@ -4,14 +4,22 @@
 #include <cctype>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include <map>
 #include <sstream>
 #include <string>
 
-using namespace std;
+#include "ProcessInput.h"
 
-string toLowerCase(const string &str);
-void removePunctuationUpdateMap(const string &str, map<string, int> &wordCount);
-void createCSVs();
+namespace fs = filesystem;
+
+pair<int, map<string, int>> countWordsInBook(string filePath);
+string appendToBookMetadata(string bookName, int totalWords);
+void appendToCSV(string filePath, string row);
+void indexAllBooks();
+void indexBook(string bookName);
+void updateWordCSVs(string bookId, map<string, int> wordCount);
+streampos getLastLineStartPos(string filePath);
+string readUntilComma(streampos linePos, string filePath);
 
 #endif

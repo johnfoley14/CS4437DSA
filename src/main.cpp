@@ -1,8 +1,9 @@
+#include <cstdlib>
 #include <string>
 
+#include "IndexBooks.h"
 #include "Parse.h"
 #include "ProcessInput.h"
-#include "IndexBooks.h"
 
 void printChoices() {
   cout << "Your choices are:\n\r"
@@ -14,19 +15,28 @@ void printChoices() {
        << endl;
 }
 
+void clearScreen() {
+#ifdef _WIN32
+  std::system("cls");  // For Windows
+#else
+  std::system("clear");  // For Linux and macOS
+#endif
+}
+
 int main() {
   string choice;
   bool quit = false;
-
-  printChoices();
+  // clearScreen();
 
   while (!quit) {
+    printChoices();
     getline(cin, choice);
+    // clearScreen();
 
     switch (choice[0]) {
       case '1':
-        cout << "You selected 1" << endl;
-        createCSVs();
+        cout << "You selected: 1 - Reload indexed books" << endl;
+        indexAllBooks();
         break;
       case '2':
         sanitizeLine(choice).display();
@@ -42,7 +52,7 @@ int main() {
         cout << "Invalid input, please structure your input as <Choice Number> "
                 "<List of optional args>\r\n";
     }
-    printChoices();
+    cout << endl;
   }
   return 0;
 }
