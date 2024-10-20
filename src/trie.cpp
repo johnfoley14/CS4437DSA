@@ -9,6 +9,14 @@ TrieNode::TrieNode() {
     }
 }
 
+TrieNode::~TrieNode() {
+    for (int i = 0; i < 26; i++) {
+        if (children[i] != nullptr) {
+            delete children[i];  // Recursively delete children
+        }
+    }
+}
+
 bool isCSV(const string& filename){
     if(filename.substr(filename.find_last_of(".")+1) == "csv"){
         return true;
@@ -32,6 +40,7 @@ void addWordToTrie(TrieNode* root, const string& word){
     for (char c : word){
         if(curr->children[c - 'a'] == nullptr){ // words must only be between[a-z], lowercase
             TrieNode* newNode = new TrieNode();
+            newNode->letter = c;
             curr->children[c - 'a'] = newNode;
     }
     curr = curr->children[c - 'a'];
@@ -53,9 +62,9 @@ TrieNode* findNode(TrieNode* root, const string& partial) { // search word in tr
     return curr;  // Return last char of partial word to continue search (iterate through children)
 }
 
-void findWords(TrieNode* node, const string &partial, vector<string>& words) {
+void findWords(TrieNode* node, const string &partial, DynamicArray<std::string> &words) {
     if(node->isLeaf){
-        words.push_back(partial); // the partial word is a word
+        words.add(partial); // the partial word is a word
     }
 
     for (int i = 0; i < 26; i++) {
@@ -67,9 +76,9 @@ void findWords(TrieNode* node, const string &partial, vector<string>& words) {
     
 }
 
-vector<string> searchTrie(TrieNode* root, const string& partial) {
+DynamicArray<std::string> searchTrie(TrieNode* root, const string& partial) {
     TrieNode* node = findNode(root, partial);  // Finding node of last char in partial
-    vector<string> words;
+    DynamicArray<std::string> words;
 
     if (node == nullptr) {
         return words;  // no words found
