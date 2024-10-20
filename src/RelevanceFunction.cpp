@@ -3,9 +3,9 @@
 using namespace std;
 
 // gets the score of a word in a file. This is a precalculated score that is stored in the CSV index file
-static float getWordRelevanceScore(int wordCount, int totalWords, int filesContainingWord)
+float getWordRelevanceScore(int wordCount, int totalWords, int filesContainingWord)
 {
-    float relevanceInFile = (float)wordCount / totalWords;
+    float relevanceInFile = (float) wordCount / totalWords;
     float inverseIndexScore = relevanceInFile / filesContainingWord;
     return inverseIndexScore;
 }

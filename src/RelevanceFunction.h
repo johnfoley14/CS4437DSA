@@ -7,7 +7,7 @@
 #include "LinkedList.h"
 
 // Gets the word relevance score based on word count, total words in the file, and the number of files containing the word
-static float getWordRelevanceScore(int wordCount, int totalWords, int filesContainingWord);
+float getWordRelevanceScore(int wordCount, int totalWords, int filesContainingWord);
 
 // Calculates bonus marks based on the proximity of word positions in the file
 int calculateBonusMarks(int pos1, int pos2);
