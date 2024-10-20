@@ -1,13 +1,13 @@
 #include "IndexBooks.h"
 
-pair<int, map<string, int>> countWordsInBook(string filePath) {
+WordsInBook countWordsInBook(string filePath) {
   ifstream file(filePath);
   if (!file.is_open()) {
     cerr << "Error: Could not open the file!" << endl;
     return {};
   }
 
-  map<string, int> wordCount;
+  map<string, WordMetadata> wordCounts;
   string line, word;
   int totalCount = 0;
 
@@ -17,13 +17,15 @@ pair<int, map<string, int>> countWordsInBook(string filePath) {
 
     // Read each word from the line
     for (string word : words) {
-      wordCount[word]++;
+      wordCounts[word].count++;
+      cout << "Word: " << word << " at position: " << totalCount << endl;
+      wordCounts[word].positions.push_back(totalCount);
       totalCount++;
     }
   }
 
   file.close();
-  return {totalCount, wordCount};
+  return {totalCount, wordCounts};
 }
 
 void appendToCSV(string filePath, string row) {
@@ -86,15 +88,22 @@ void addPreviousRows(string filePath, string bookId) {
   }
 }
 
-void updateWordCSVs(string bookId, map<string, int> wordCount) {
-  for (const auto& entry : wordCount) {
+void updateWordCSVs(string bookId, WordsInBook words) {
+  for (const auto& entry : words.data) {
     string filePath = "../index/words/" + entry.first + ".csv";
 
     if (bookId != "1") {
       addPreviousRows(filePath, bookId);
     }
 
-    string row = bookId + ',' + to_string(entry.second);
+    string row = bookId + ',' + to_string(entry.second.count);
+    row += ",\"[";
+    for (int position : entry.second.positions) {
+      cout << "Adding position: " << position << " for " << entry.first << endl;
+      row += to_string(position) + ',';
+    }
+    row.pop_back();
+    row += "]\"";
     appendToCSV(filePath, row);
   }
 
@@ -102,7 +111,7 @@ void updateWordCSVs(string bookId, map<string, int> wordCount) {
   string emptyRow = bookId + ',';
   for (const auto& entry : fs::directory_iterator("../index/words/")) {
     if (fs::is_regular_file(entry.status())) {
-      if (wordCount.find(entry.path().stem().string()) == wordCount.end()) {
+      if (words.data.find(entry.path().stem().string()) == words.data.end()) {
         appendToCSV(entry.path(), emptyRow);
       }
     }
@@ -270,14 +279,16 @@ void indexBook(string bookName) {
     return;
   }
 
+  cout << "Attempting to indexed new book: " << bookName << endl;
+
   string path = "../books/" + bookName + ".txt";
 
-  int totalWords;
-  map<string, int> wordCounts;
-  tie(totalWords, wordCounts) = countWordsInBook(path);
+  WordsInBook words = countWordsInBook(path);
 
-  string bookId = appendToBookMetadata(bookName, totalWords);
-  updateWordCSVs(bookId, wordCounts);
+  cout << "Finished reading in book" << endl;
+
+  string bookId = appendToBookMetadata(bookName, words.totalWords);
+  updateWordCSVs(bookId, words);
 
   cout << "Successfully indexed new book: " << bookName << endl;
 }
