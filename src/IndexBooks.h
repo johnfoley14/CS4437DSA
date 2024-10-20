@@ -11,12 +11,13 @@
 
 #include "ProcessInput.h"
 #include "RelevanceFunction.h"
+#include "DynamicArray.h"
 
 namespace fs = filesystem;
 
 struct WordMetadata {
     int count;
-    std::vector<int> positions;
+    vector<int> positions;
 };
 
 struct WordsInBook {
@@ -29,7 +30,7 @@ string appendToBookMetadata(string bookName, int totalWords);
 void appendToCSV(string filePath, string row);
 void indexAllBooks();
 void indexBook(string bookName);
-void updateWordCSVs(string bookId, map<string, int> wordCount);
+void updateWordCSVs(string bookId, WordsInBook words);
 int countBooksWithWord(string filePath);
 void updateWordMetadata();
 

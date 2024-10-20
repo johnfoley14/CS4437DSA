@@ -12,13 +12,12 @@ WordsInBook countWordsInBook(string filePath) {
   int totalCount = 0;
 
   // Maxing to 10 words for testing
-  while (getline(file, line) && totalCount < 10) {
+  while (getline(file, line)) {
     LinkedList<string> words = sanitizeLine(line);
 
     // Read each word from the line
     for (string word : words) {
       wordCounts[word].count++;
-      cout << "Word: " << word << " at position: " << totalCount << endl;
       wordCounts[word].positions.push_back(totalCount);
       totalCount++;
     }
@@ -98,16 +97,15 @@ void updateWordCSVs(string bookId, WordsInBook words) {
 
     string row = bookId + ',' + to_string(entry.second.count);
     row += ",\"[";
-    for (int position : entry.second.positions) {
-      cout << "Adding position: " << position << " for " << entry.first << endl;
-      row += to_string(position) + ',';
+    for (int i = 0; i < entry.second.positions.size(); i++) {
+      row += to_string(entry.second.positions[i]) + ',';
     }
     row.pop_back();
     row += "]\"";
     appendToCSV(filePath, row);
   }
 
-  // Add book to word csvs that the book didn't have
+  // Add book to word csvs that the book didn't have that word
   string emptyRow = bookId + ',';
   for (const auto& entry : fs::directory_iterator("../index/words/")) {
     if (fs::is_regular_file(entry.status())) {
@@ -285,7 +283,7 @@ void indexBook(string bookName) {
 
   WordsInBook words = countWordsInBook(path);
 
-  cout << "Finished reading in book" << endl;
+  cout << "Finished reading in book: " << bookName << endl;
 
   string bookId = appendToBookMetadata(bookName, words.totalWords);
   updateWordCSVs(bookId, words);
