@@ -9,6 +9,7 @@
 #include "BookInfo.h"
 #include "LinkedList.h"
 #include "RelevanceFunction.h"
+#include "MinHeap.h"
 
 int *parsePositions(const string &posStr, int count);
 BookInfo *processCSVFiles(const string *words, int length, int fileCount);

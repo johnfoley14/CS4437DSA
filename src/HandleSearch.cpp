@@ -37,15 +37,16 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
 
         string filename = "../index/words/" + words[i] + ".csv";
         ifstream file(filename);
+        ifstream scoreFile("../index/scores/" + words[i] + ".csv");
 
-        if (!file.is_open())
+        if (!file.is_open() || !scoreFile.is_open())
         {
-            cerr << "Could not open file: " << filename << endl;
+            cerr << "Could not open file: " << words[i] << endl;
             continue;
         }
 
-        string line;
-        while (getline(file, line))
+        string line, scoresLine;
+        while (getline(file, line) && getline(scoreFile, scoresLine))
         {
             if (line.empty() || line == ",,,")
             {
@@ -57,10 +58,11 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
 
             // extract file data, separated by commas
             getline(ss, fileIdStr, ',');
+            getline(ss, countStr, ',');
             getline(ss, positionsStr, ',');
 
             // If fileIdStr is empty, it means this is a line like ",,,", so we skip it
-            if (fileIdStr.empty())
+            if (countStr.empty())
             {
                 continue;
             }
@@ -93,20 +95,16 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
             // Remove the quotes around positionsStr
             positionsStr = positionsStr.substr(1, positionsStr.size() - 2);
 
-            getline(ss, countStr, ',');
-            getline(ss, totalWordsStr, ',');
-
             // Check if any required field is empty, and skip the line if so
-            if (fileIdStr.empty() || countStr.empty() || totalWordsStr.empty() || positionsStr.empty())
+            if (fileIdStr.empty() || countStr.empty() || positionsStr.empty())
             {
                 cerr << "Error: Invalid line in file: " << filename << endl;
                 continue; // Skip invalid lines
             }
-
             int fileId = stoi(fileIdStr);
             int count = stoi(countStr);
-            int totalWords = stoi(totalWordsStr);
-            float score = 0.0; // Default score value for now, to be calculated later in the project
+            float score = stof(scoresLine); // Default score value for now, to be calculated later in the project
+
             // if notFlag, it means we had NOT before this word in the search, so we want to negate the score so files with more of this word are ranked lower
             if (notFlag)
             {
@@ -119,9 +117,8 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
             if (fileId >= 0 && fileId < fileCount)
             {
                 bookInfos[fileId].fileId = fileId;
-                bookInfos[fileId].totalWords = totalWords;
 
-                WordInfo wordInfo(count, score, positions); // Assuming score is 0.0, NOTE to talk with team about this to have precalculated score in CSV and parsed also
+                WordInfo wordInfo(count, score, positions);
                 bookInfos[fileId].words.append(wordInfo);
             }
 
@@ -146,7 +143,7 @@ int countWords(const string &input)
         wordCount++;
     }
 
-    // Subtract 1 to exclude the first word
+    // Subtract 1 to exclude the first word which is the number representing the option picked (2 in this case)
     return (wordCount > 0) ? wordCount - 1 : 0;
 }
 
@@ -156,7 +153,7 @@ void splitStringIntoArray(const string &input, string *output, int wordCount)
     string word;
     int index = 0;
 
-    // Skip the first word
+    // Skip the first word which is the option number
     iss >> word;
 
     // Split the string by spaces and insert the remaining words into the array
@@ -173,5 +170,55 @@ void handleSearch(string choice)
     string *output = new string[wordCount];
     // split the searched string into an array of words
     splitStringIntoArray(choice, output, wordCount);
-    BookInfo *searchBookInfos = processCSVFiles(output, wordCount, 1);
+
+    ifstream file("../index/Overview.csv");
+    if (!file.is_open())
+    {
+        cerr << "Could not open Overview.csv " << endl;
+        return;
+    }
+
+    string line;
+    int totalBooks = 0;
+
+    while (getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue; // Skip empty lines
+        }
+
+        stringstream ss(line);
+        string key, value;
+
+        getline(ss, key, ',');
+        getline(ss, value, ',');
+
+        totalBooks = stoi(value);
+    }
+    BookInfo *searchBookInfos = processCSVFiles(output, wordCount, totalBooks);
+    MinHeap heap(50);
+    for (int i = 0; i < totalBooks; i++)
+    {
+        // if the book has no occurences of the searched words, we skip it
+        if (searchBookInfos[i].words.head == nullptr)
+        {
+            continue;
+        }
+
+        // for the first 50 books, we insert them into the heap as BookScore {fileId, score}
+        if (heap.heapSize < 50)
+        {
+            heap.insert({searchBookInfos[i].fileId, getSearchRelevanceScore(searchBookInfos[i])});
+        }
+        else
+        {
+            if (getSearchRelevanceScore(searchBookInfos[i]) > heap.getMin().score)
+            {
+                heap.extractMin();
+                heap.insert({searchBookInfos[i].fileId, getSearchRelevanceScore(searchBookInfos[i])});
+            }
+        }
+    }
+    heap.printHeap();
 }

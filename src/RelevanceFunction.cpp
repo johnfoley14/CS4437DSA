@@ -5,9 +5,9 @@ using namespace std;
 // gets the score of a word in a file. This is a precalculated score that is stored in the CSV index file
 float getWordRelevanceScore(int wordCount, int totalWords, int filesContainingWord)
 {
-    float relevanceInFile = (float) wordCount / totalWords;
+    float relevanceInFile = (float)wordCount / totalWords;
     float inverseIndexScore = relevanceInFile / filesContainingWord;
-    return inverseIndexScore;
+    return inverseIndexScore * 1000; // multiply by 1000 to scale
 }
 
 // NOTE these values may need to be tweaked depending on how big relevance scores we are getting once we have files loaded in
@@ -53,6 +53,13 @@ float getSearchRelevanceScore(BookInfo bookInfos)
         // Compare this word1 with all words after it and calculate bonus marks if words are close
         while (word2Node != nullptr)
         {
+
+            if (word2Node->data.score < 0)
+            {
+                cout << "Negative score found" << bookInfos.fileId << endl;
+                word2Node = word2Node->next;
+                continue;
+            }
             WordInfo &word2 = word2Node->data;
 
             // Compare positions in word1 with positions in word2

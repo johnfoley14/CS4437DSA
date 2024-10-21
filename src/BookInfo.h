@@ -11,7 +11,6 @@ struct WordInfo
     int *positions; // Dynamic array of positions (size is equal to count)
     int count;      // Number of occurrences (also the size of positions array)
     float score;    // precomputed score for this word
-    bool negativeScore = false;
 
     friend ostream &operator<<(ostream &os, const WordInfo &wi)
     {
