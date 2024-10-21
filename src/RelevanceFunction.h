@@ -1,7 +1,6 @@
 #ifndef RELEVANCEFUNCTION_H
 #define RELEVANCEFUNCTION_H
 
-#include <vector>
 #include <cmath> // For abs()
 #include "BookInfo.h"
 #include "LinkedList.h"

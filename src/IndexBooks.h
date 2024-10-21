@@ -8,6 +8,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "ProcessInput.h"
 #include "RelevanceFunction.h"
@@ -15,12 +16,14 @@
 
 namespace fs = filesystem;
 
-struct WordMetadata {
-    int count;
-    vector<int> positions;
+struct WordMetadata
+{
+  int count;
+  vector<int> positions;
 };
 
-struct WordsInBook {
+struct WordsInBook
+{
   int totalWords;
   map<string, WordMetadata> data;
 };
