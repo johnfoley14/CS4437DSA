@@ -218,7 +218,12 @@ void addRelevanceScores() {
   for (const auto& entry : fs::directory_iterator("../index/words/")) {
     if (fs::is_regular_file(entry.status())) {
       int booksContainingWord = countBooksWithWord(entry.path());
+      string scoreFilePath = "../index/scores/" + entry.path().stem().string() + ".csv";
       string row;
+
+      if (fs::exists(scoreFilePath)) {
+        fs::remove(scoreFilePath);
+      }
 
       ifstream wordFile(entry.path());
       ifstream bookFile("../index/BookMetadata.csv");
