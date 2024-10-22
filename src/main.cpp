@@ -29,6 +29,7 @@ int main() {
   TrieNode root;
   WordsInBook* wordsInBook = new WordsInBook;
   bool quit = false;
+  bool trieLoaded = false;
   // clearScreen();
 
   while (!quit) {
@@ -47,6 +48,7 @@ int main() {
         cout << "You selected: 1 - Reload indexed books" << endl;
         indexAllBooks();
         findFileAndAddToTrie(root);
+        trieLoaded = true;
         break;
       case '2':
         // handle user seach query
@@ -54,6 +56,10 @@ int main() {
         break;
       case '3': {
         cout << "You selected 3 - Auto complete" << endl;
+        if (!trieLoaded) {
+          findFileAndAddToTrie(root);
+          trieLoaded = true;
+        }
         if (choice.length() <= 2) {
           cout << "Please provide a word for autocomplete after '3'.\n";
           break;

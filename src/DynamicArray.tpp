@@ -9,7 +9,6 @@ DynamicArray<T>::DynamicArray(int capacity) {
 
 template <typename T>
 DynamicArray<T>::~DynamicArray() {
-  cout << "deleting array" << endl;
   delete[] data;
 }
 
@@ -63,8 +62,8 @@ void DynamicArray<T>::resize() {
 }
 
 template <typename T>
-void DynamicArray<T>::printElements() const {
-  for (int i = 0; i < size; i++) {
+void DynamicArray<T>::printElements(int limit) const {
+  for (int i = 0; i < size && i < limit; i++) {
     std::cout << data[i] << std::endl;
   }
   std::cout << std::endl;

@@ -119,6 +119,7 @@ void updateWordCSVs(string bookId, WordsInBook& words) {
     }
     row.pop_back();
     row += "]\"";
+    
     appendToCSV(filePath, row);
   }
 
