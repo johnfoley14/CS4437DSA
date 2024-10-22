@@ -15,7 +15,7 @@ void printChoices()
           "2 <keywords> - Search for a book using a list of keywords\n\r"
           "3 <word> - Autocomplete\n\r"
           "4 - Delete indexed entries\n\r"
-          "5 - Quit"
+          "5 - Quit\n\r"
           "Please enter your choice:"
        << endl;
 }
