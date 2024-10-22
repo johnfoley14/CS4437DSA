@@ -38,15 +38,16 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
         string filename = "../index/words/" + words[i] + ".csv";
         ifstream file(filename);
         ifstream scoreFile("../index/scores/" + words[i] + ".csv");
+        ifstream bookMetadata("../index/BookMetadata.csv");
 
-        if (!file.is_open() || !scoreFile.is_open())
+        if (!file.is_open() || !scoreFile.is_open() || !bookMetadata.is_open())
         {
             cerr << "Could not open file: " << words[i] << endl;
             continue;
         }
 
-        string line, scoresLine;
-        while (getline(file, line) && getline(scoreFile, scoresLine))
+        string line, scoresLine, bookLine;
+        while (getline(file, line) && getline(scoreFile, scoresLine) && getline(bookMetadata, bookLine))
         {
             if (line.empty() || line == ",,,")
             {
@@ -105,6 +106,20 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
             int count = stoi(countStr);
             float score = stof(scoresLine); // Default score value for now, to be calculated later in the project
 
+            stringstream metadataS(bookLine);
+            string temp2;
+            // First column (ID)
+            getline(metadataS, temp2, ',');
+
+            // Second column (Title with underscore and ID)
+            getline(metadataS, temp2, ',');
+
+            // Find the position of the underscore
+            size_t underscore_pos = temp2.find('_');
+
+            // Extract the title before the underscore
+            string title = temp2.substr(0, underscore_pos);
+
             // if notFlag, it means we had NOT before this word in the search, so we want to negate the score so files with more of this word are ranked lower
             if (notFlag)
             {
@@ -117,6 +132,7 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
             if (fileId >= 0 && fileId < fileCount)
             {
                 bookInfos[fileId].fileId = fileId;
+                bookInfos[fileId].title = title;
 
                 WordInfo wordInfo(count, score, positions);
                 bookInfos[fileId].words.append(wordInfo);
@@ -161,6 +177,19 @@ void splitStringIntoArray(const string &input, string *output, int wordCount)
     {
         output[index++] = word;
     }
+}
+
+void printResults(MinHeap &resultsHeap)
+{
+    string output = "";
+    int startRankNum = resultsHeap.heapSize;
+    while (resultsHeap.heapSize > 0)
+    {
+        output += to_string(startRankNum) + ". " + resultsHeap.extractMin().title + "\n";
+        startRankNum--;
+    }
+    cout << output;
+    return;
 }
 
 void handleSearch(string choice)
@@ -209,16 +238,17 @@ void handleSearch(string choice)
         // for the first 50 books, we insert them into the heap as BookScore {fileId, score}
         if (heap.heapSize < 50)
         {
-            heap.insert({searchBookInfos[i].fileId, getSearchRelevanceScore(searchBookInfos[i])});
+            heap.insert({searchBookInfos[i].fileId, getSearchRelevanceScore(searchBookInfos[i]), searchBookInfos[i].title});
         }
         else
         {
             if (getSearchRelevanceScore(searchBookInfos[i]) > heap.getMin().score)
             {
                 heap.extractMin();
-                heap.insert({searchBookInfos[i].fileId, getSearchRelevanceScore(searchBookInfos[i])});
+                heap.insert({searchBookInfos[i].fileId, getSearchRelevanceScore(searchBookInfos[i]), searchBookInfos[i].title});
             }
         }
     }
-    heap.printHeap();
+    printResults(heap);
+    return;
 }
