@@ -1,55 +1,48 @@
 #include "IndexBooks.h"
 
-WordsInBook countWordsInBook(string filePath)
-{
+void countWordsInBook(string filePath, WordsInBook& result) {
   ifstream file(filePath);
-  if (!file.is_open())
-  {
+  if (!file.is_open()) {
     cerr << "Error: Could not open the file!" << endl;
-    return {};
+    return;
   }
 
-  HashMap<string, WordMetadata> wordCounts;
+  HashMap<string, WordMetadata*>* wordCounts = new HashMap<string, WordMetadata*>();
   string line, word;
   int totalCount = 0;
   int position = 0;
 
   // Maxing to 10 words for testing
-  while (getline(file, line))
-  {
+  while (getline(file, line)) {
     LinkedList<string> words = sanitizeLine(line);
 
     // Read each word from the line
-    for (const string& word : words)
-    {
-        WordMetadata wordMeta;
-        if (wordCounts.get(word, wordMeta))
-        {
-            wordMeta.count++;
-            wordMeta.positions.push_back(position);
-            wordCounts.insert(word, wordMeta); // updating existing
-        }
-        else
-        {
-            wordMeta.count = 1;
-            wordMeta.positions.push_back(position);
-            wordCounts.insert(word, wordMeta); // inserting new
-        }
-        totalCount++;
-        position++;
+    for (const string& word : words) {
+      WordMetadata* wordMeta = new WordMetadata();
+      if (wordCounts->get(word, wordMeta)) {
+        wordMeta->count++;
+        wordMeta->positions.append(position);
+        wordCounts->insert(word, wordMeta);  // updating existing
+      } else {
+        wordMeta->count = 1;
+        wordMeta->positions.append(position);
+        wordCounts->insert(word, wordMeta);  // inserting new
+      }
+      totalCount++;
+      position++;
     }
   }
+  WordMetadata* myWordMeta = new WordMetadata();
 
   file.close();
-  return {totalCount, wordCounts};
+  WordsInBook* newResult = new WordsInBook{totalCount, *wordCounts};
+  result = *newResult;
 }
 
-void appendToCSV(string filePath, string row)
-{
+void appendToCSV(string filePath, string row) {
   ofstream file(filePath, ios::app);
 
-  if (!file.is_open())
-  {
+  if (!file.is_open()) {
     cerr << "Failed to open or create output csv: " << filePath << endl;
     return;
   }
@@ -58,12 +51,10 @@ void appendToCSV(string filePath, string row)
   file.close();
 }
 
-string getLastLine(string filePath)
-{
+string getLastLine(string filePath) {
   ifstream file(filePath);
 
-  if (!file.is_open())
-  {
+  if (!file.is_open()) {
     cerr << "Error opening file: " << filePath << endl;
     return "";
   }
@@ -74,14 +65,12 @@ string getLastLine(string filePath)
   linePos -= 2;
   char ch;
 
-  while (linePos > 0)
-  {
+  while (linePos > 0) {
     linePos -= 1;
     file.seekg(linePos);
     file.get(ch);
 
-    if (ch == '\n')
-    {
+    if (ch == '\n') {
       linePos += 1;
       break;
     }
@@ -93,12 +82,10 @@ string getLastLine(string filePath)
   return line;
 }
 
-void addPreviousRows(string filePath, string bookId)
-{
+void addPreviousRows(string filePath, string bookId) {
   int lastId = 0;
 
-  if (fs::exists(filePath))
-  {
+  if (fs::exists(filePath)) {
     string lastLine = getLastLine(filePath);
     stringstream ss(lastLine);
     string lastIdStr;
@@ -106,71 +93,61 @@ void addPreviousRows(string filePath, string bookId)
     lastId = stoi(lastIdStr);
   }
 
-  for (int i = lastId + 1; i < stoi(bookId); i++)
-  {
+  for (int i = lastId + 1; i < stoi(bookId); i++) {
     string emptyRow = to_string(i) + ',';
     appendToCSV(filePath, emptyRow);
   }
 }
 
-void updateWordCSVs(string bookId, WordsInBook words)
-{
-    vector<pair<string, WordMetadata>> entries = words.data.getAll(); // change me to LinkedList
-    for (const auto& entry : entries)
-    {
-        string filePath = "../index/words/" + entry.first + ".csv";
+void updateWordCSVs(string bookId, WordsInBook& words) {
+  LinkedList<pair<string, WordMetadata*>> entries =
+      words.data.getAll();  // change me to LinkedList
+  for (const auto& entry : entries) {
+    string filePath = "../index/words/" + entry.first + ".csv";
 
-        if (bookId != "1")
-        {
-            addPreviousRows(filePath, bookId);
-        }
-
-        string row = bookId + ',' + to_string(entry.second.count);
-        row += ",\"[";
-        for (size_t i = 0; i < entry.second.positions.size(); i++)
-        {
-            row += to_string(entry.second.positions[i]);
-            if (i < entry.second.positions.size() - 1)
-            {
-                row += ',';
-            }
-        }
-        row += "]\"";
-        appendToCSV(filePath, row);
+    if (bookId != "1") {
+      addPreviousRows(filePath, bookId);
     }
 
-    // Add book to word CSVs that the book didn't contain that word
-    string emptyRow = bookId + ',';
-    for (const auto& entry : fs::directory_iterator("../index/words/"))
-    {
-        if (fs::is_regular_file(entry.status()))
-        {
-            string word = entry.path().stem().string();
-            WordMetadata dummyValue;
-            // need to check if the word is already in the book with dummyValue
-            if (!words.data.get(word, dummyValue))
-            {
-                appendToCSV(entry.path().string(), emptyRow);
-            }
-        }
+    string row = bookId + ',' + to_string(entry.second->count);
+    row += ",\"[";
+    int i = 0;
+    // TODO add 'exists' method to LinkedList
+    while (entry.second->positions.exists(i)) {
+      row += to_string(entry.second->positions.get(i)) + ',';
+      i++;
     }
+    row.pop_back();
+    row += "]\"";
+    appendToCSV(filePath, row);
+  }
+
+  // Add book to word CSVs that the book didn't contain that word
+  string emptyRow = bookId + ',';
+  for (const auto& entry : fs::directory_iterator("../index/words/")) {
+    if (fs::is_regular_file(entry.status())) {
+      string word = entry.path().stem().string();
+      WordMetadata* dummyValue;
+      // need to check if the word is already in the book with dummyValue
+      if (!words.data.get(word, dummyValue)) {
+        appendToCSV(entry.path().string(), emptyRow);
+      }
+    }
+  }
 }
 
-int countBooksWithWord(string filePath)
-{
+int countBooksWithWord(string filePath) {
   int result = 0;
   ifstream file(filePath);
 
-  if (!file.is_open())
-  {
+  if (!file.is_open()) {
     cerr << "Error: Could not open the file:" << filePath << endl;
     return 0;
   }
 
   string currentLine;
 
-  while (getline(file, currentLine))
-  {
+  while (getline(file, currentLine)) {
     stringstream ss(currentLine);
     string currentWordCount;
     string discard;
@@ -178,27 +155,23 @@ int countBooksWithWord(string filePath)
     getline(ss, discard, ',');
     getline(ss, currentWordCount, ',');
 
-    if (currentWordCount != "")
-    {
+    if (currentWordCount != "") {
       result++;
     }
   }
   return result;
 }
 
-bool bookIsIndexed(string bookName)
-{
+bool bookIsIndexed(string bookName) {
   const string filePath = "../index/BookMetadata.csv";
 
-  if (!fs::exists(filePath))
-  {
+  if (!fs::exists(filePath)) {
     return false;
   }
 
   ifstream ifile(filePath);
 
-  if (!ifile.is_open())
-  {
+  if (!ifile.is_open()) {
     cerr << "Failed to open 'BookMetadata.csv' for reading!" << endl;
     return "";
   }
@@ -207,15 +180,13 @@ bool bookIsIndexed(string bookName)
   string currentBookName;
   string discard;
 
-  while (getline(ifile, line))
-  {
+  while (getline(ifile, line)) {
     stringstream ss(line);
 
     getline(ss, discard, ',');
     getline(ss, currentBookName, ',');
 
-    if (currentBookName == bookName)
-    {
+    if (currentBookName == bookName) {
       ifile.close();
       return true;
     }
@@ -226,12 +197,10 @@ bool bookIsIndexed(string bookName)
 }
 
 // Returns the id of the book being added
-string appendToBookMetadata(string bookName, int totalWords)
-{
+string appendToBookMetadata(string bookName, int totalWords) {
   const string filePath = "../index/BookMetadata.csv";
 
-  if (fs::exists(filePath))
-  {
+  if (fs::exists(filePath)) {
     string lastLine = getLastLine(filePath);
     stringstream ss(lastLine);
     string lastId;
@@ -242,26 +211,20 @@ string appendToBookMetadata(string bookName, int totalWords)
     appendToCSV(filePath, row);
 
     return newId;
-  }
-  else
-  {
+  } else {
     string row = "1," + bookName + ',' + to_string(totalWords);
     appendToCSV(filePath, row);
     return "1";
   }
 }
 
-void updateWordMetadata()
-{
-  if (fs::exists("../index/WordMetadata.csv"))
-  {
+void updateWordMetadata() {
+  if (fs::exists("../index/WordMetadata.csv")) {
     fs::remove("../index/WordMetadata.csv");
   }
 
-  for (const auto &entry : fs::directory_iterator("../index/words/"))
-  {
-    if (fs::is_regular_file(entry.status()))
-    {
+  for (const auto& entry : fs::directory_iterator("../index/words/")) {
+    if (fs::is_regular_file(entry.status())) {
       int booksContainingWord = countBooksWithWord(entry.path().string());
       string row =
           entry.path().stem().string() + ',' + to_string(booksContainingWord);
@@ -271,18 +234,15 @@ void updateWordMetadata()
   }
 }
 
-void addRelevanceScores()
-{
-  for (const auto &entry : fs::directory_iterator("../index/words/"))
-  {
-    if (fs::is_regular_file(entry.status()))
-    {
+void addRelevanceScores() {
+  for (const auto& entry : fs::directory_iterator("../index/words/")) {
+    if (fs::is_regular_file(entry.status())) {
       int booksContainingWord = countBooksWithWord(entry.path().string());
-      string scoreFilePath = "../index/scores/" + entry.path().stem().string() + ".csv";
+      string scoreFilePath =
+          "../index/scores/" + entry.path().stem().string() + ".csv";
       string row;
 
-      if (fs::exists(scoreFilePath))
-      {
+      if (fs::exists(scoreFilePath)) {
         fs::remove(scoreFilePath);
       }
 
@@ -294,29 +254,25 @@ void addRelevanceScores()
       string currentLine;
       string discard;
       string countInBook;
-      while (getline(wordFile, currentLine))
-      {
+      while (getline(wordFile, currentLine)) {
         getline(bookFile, currentBook);
         stringstream ssBook(currentBook);
         stringstream ssWord(currentLine);
 
-        getline(ssWord, discard, ','); // Discard bookId
+        getline(ssWord, discard, ',');  // Discard bookId
         getline(ssWord, countInBook);
 
         getline(ssBook, discard, ',');
         getline(ssBook, discard, ',');
         getline(ssBook, totalInBook);
 
-        if (countInBook != "")
-        {
+        if (countInBook != "") {
           int count = stoi(countInBook);
           int countInBook = stoi(totalInBook);
           float relevance =
               getWordRelevanceScore(count, countInBook, booksContainingWord);
           row = to_string(relevance);
-        }
-        else
-        {
+        } else {
           row = "";
         }
 
@@ -328,30 +284,22 @@ void addRelevanceScores()
 }
 
 // Create the required directories if they don't exist
-void createIndexDirs()
-{
+void createIndexDirs() {
   const vector<string> requiredPaths = {"../index/words/", "../index/scores/"};
 
-  for (string path : requiredPaths)
-  {
-    if (!fs::exists(path))
-    {
-      if (fs::create_directories(path))
-      {
+  for (string path : requiredPaths) {
+    if (!fs::exists(path)) {
+      if (fs::create_directories(path)) {
         cout << "Created required directories: " << path << endl;
-      }
-      else
-      {
+      } else {
         cerr << "Failed to create required directories!" << endl;
       }
     }
   }
 }
 
-void indexBook(string bookName)
-{
-  if (bookIsIndexed(bookName))
-  {
+void indexBook(string bookName) {
+  if (bookIsIndexed(bookName)) {
     return;
   }
 
@@ -359,38 +307,35 @@ void indexBook(string bookName)
 
   string path = "../books/" + bookName + ".txt";
 
-  WordsInBook words = countWordsInBook(path);
+  WordsInBook* words = new WordsInBook;
+  countWordsInBook(path, *words);
 
   cout << "Finished reading in book: " << bookName << endl;
 
-  string bookId = appendToBookMetadata(bookName, words.totalWords);
-  updateWordCSVs(bookId, words);
+  string bookId = appendToBookMetadata(bookName, words->totalWords);
+  updateWordCSVs(bookId, *words);
 
   cout << "Successfully indexed new book: " << bookName << endl;
+  delete words;
 }
 
-void indexAllBooks()
-{
+void indexAllBooks() {
   auto start = chrono::high_resolution_clock::now();
   createIndexDirs();
-  if (!fs::exists("../books/"))
-  {
+  if (!fs::exists("../books/")) {
     cerr << "No books directory found!" << endl;
     return;
   }
 
   int totalBooks = 0;
-  for (const auto &entry : fs::directory_iterator("../books/"))
-  {
-    if (fs::is_regular_file(entry.status()))
-    {
+  for (const auto& entry : fs::directory_iterator("../books/")) {
+    if (fs::is_regular_file(entry.status())) {
       indexBook(entry.path().stem().string());
       totalBooks++;
     }
   }
 
-  if (fs::exists("../index/Overview.csv"))
-  {
+  if (fs::exists("../index/Overview.csv")) {
     fs::remove("../index/Overview.csv");
   }
 
@@ -401,5 +346,6 @@ void indexAllBooks()
   auto end = chrono::high_resolution_clock::now();
   auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
 
-  cout << "Indexing all books took " << duration.count() << " milliseconds." << endl;
+  cout << "Indexing all books took " << duration.count() << " milliseconds."
+       << endl;
 }

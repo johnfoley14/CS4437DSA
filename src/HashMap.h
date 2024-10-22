@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <functional> // std::hash
+#include "LinkedList.h"
+#include "DynamicArray.h"
 
 using namespace std;
 
@@ -18,7 +20,7 @@ private:
         Entry() : key(), value(), isActive(false), isDeleted(false) {}
     };
 
-    vector<Entry> table;
+    DynamicArray<Entry>* table;
     size_t tableSize;
     size_t numElements;
 
@@ -33,7 +35,7 @@ public:
     void insert(const KeyType& key, const ValueType& value);
     bool get(const KeyType& key, ValueType& value) const;
     void remove(const KeyType& key);
-    vector<pair<KeyType, ValueType>> getAll() const;
+    LinkedList<pair<KeyType, ValueType>> getAll() const;
 };
 
 #include "HashMap.tpp"

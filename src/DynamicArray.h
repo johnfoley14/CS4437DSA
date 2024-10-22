@@ -3,6 +3,8 @@
 
 #include <iostream> 
 
+using namespace std;
+
 template <typename T>
 class DynamicArray {
 private:
@@ -11,13 +13,17 @@ private:
     int capacity;
 
 public:
-    DynamicArray(int capacity = 1);
+    DynamicArray(int capacity = 1000000);
     ~DynamicArray();
     void add(const T &value);
+    T get(int index);
+    void insert(int index, const T& value);
     void resize();
     void printElements() const;
     int getSize() const;
     bool operator==(const DynamicArray<T>& other) const;
+    T& operator[](int index);
+    const T& operator[](int index) const;
 };
 
 #include "DynamicArray.tpp"
