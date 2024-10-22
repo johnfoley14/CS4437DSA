@@ -148,11 +148,9 @@ template <typename KeyType, typename ValueType>
 LinkedList<pair<KeyType, ValueType>> HashMap<KeyType, ValueType>::getAll()
     const {
   LinkedList<pair<KeyType, ValueType>> allEntries;
-  cout << "getting size of table" << endl;
   for (int i = 0; i < table->getSize(); ++i) {
     const auto& entry = table->get(i);
     if (entry.isActive) {
-      cout << "Entry active" << endl;
       allEntries.append({entry.key, entry.value});
     }
   }
