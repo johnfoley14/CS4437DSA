@@ -14,7 +14,8 @@ void printChoices()
           "1 - Reload indexed books\n\r"
           "2 <keywords> - Search for a book using a list of keywords\n\r"
           "3 <word> - Autocomplete\n\r"
-          "4 - Quit\n\r"
+          "4 - Delete indexed entries\n\r"
+          "5 - Quit"
           "Please enter your choice:"
        << endl;
 }
@@ -92,7 +93,11 @@ int main()
       break;
     }
     case '4':
-      cout << "Quitting program..." << endl;
+      cout << "Deleting..." << endl;
+      deleteBooks();
+      continue;
+    case '5':
+      cout << "Quiting program..." << endl;
       quit = true;
       continue;
     default:
