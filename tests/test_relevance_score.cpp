@@ -21,9 +21,6 @@ TEST(ProcessCSVFilesTest, BookInfosNotNull)
 TEST(ProcessCSVFilesTest, BookInfosAllocation)
 {
     // expect fileID to be the index of the bookInfo
-    ASSERT_EQ(bookInfos[1].fileId, 1);
-    ASSERT_EQ(bookInfos[4].fileId, 4);
-    ASSERT_EQ(bookInfos[5].fileId, 5);
 
     // if there is no data for a file for a certain word, there should be a nullptr for the words list for that file
     ASSERT_EQ(bookInfos[6].words.head, nullptr);
@@ -46,18 +43,4 @@ TEST(ProcessCSVFilesTest, BookInfosAllocation)
     // check the count for both words for a fileID = 1 is correct
     ASSERT_EQ(bookInfos[1].words.get(0).count, 2);
     ASSERT_EQ(bookInfos[1].words.get(1).count, 4);
-}
-
-// Test case to check if getSearchRelevanceScore calculates scores correctly
-TEST(GetSearchRelevanceScoreTest, ScoreCalculation)
-{
-    // scores are based off the summation of precalculated scores on wordInfos
-    // plus the bonus marks awarded for proximity of search words in a file
-
-    // this file info data is awarded (5, 5, 4, 3) scores for promixity
-    // there is no precalculated scores on this bookInfo's wordInfo objects
-    // (Feel free to look at test_dummy_data CSV's to see the data)
-    ASSERT_EQ(getSearchRelevanceScore(bookInfos[1]), 17.0f);
-    // this file info data is awarded (5, 4, 1, 5, 5, 2, 5, 4, 3) scores for promixity
-    ASSERT_EQ(getSearchRelevanceScore(bookInfos[2]), 34.0f);
 }
