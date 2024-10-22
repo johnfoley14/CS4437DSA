@@ -36,6 +36,11 @@ int main() {
     // clearScreen();
 
     switch (choice[0]) {
+      case '0':
+        countWordsInBook(
+            "/home/djk/Development/ise/srp-cs4437/DSA/cpp/git/CS4437DSA/books/"
+            "A Room with a View_2641.txt");
+        break;
       case '1':
         cout << "You selected: 1 - Reload indexed books" << endl;
         indexAllBooks();

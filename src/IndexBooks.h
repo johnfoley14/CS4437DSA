@@ -20,13 +20,13 @@ namespace fs = filesystem;
 struct WordMetadata
 {
   int count;
-  vector<int> positions;
+  LinkedList<int> positions;
 };
 
 struct WordsInBook
 {
   int totalWords;
-  HashMap<string, WordMetadata> data;
+  HashMap<string, WordMetadata*> data;
 };
 
 WordsInBook countWordsInBook(string filePath);

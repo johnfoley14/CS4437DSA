@@ -17,11 +17,14 @@ class LinkedList {
  public:
   Node<T> *head;
   LinkedList();
+  LinkedList(const LinkedList<T> &other);
   void append(T value);
   void prepend(T value);
   void deleteByValue(T value);
   void display();
   T get(int index);
+  T get(int index) const;
+
 
   bool operator==(const LinkedList<T> &other) const;
 

@@ -81,8 +81,8 @@ void HashMap<KeyType, ValueType>::insert(const KeyType& key, const ValueType& va
         table[index].isDeleted = false;
         numElements++;
     } else { // key already exists
-        table[index].value.count = value.count;
-        table[index].value.positions = value.positions; // could this be creating a new array each time rather than updating the existing one?
+        table[index].value->count = value->count;
+        table[index].value->positions = value->positions; // could this be creating a new array each time rather than updating the existing one?
     }
 }
 
@@ -133,11 +133,11 @@ void HashMap<KeyType, ValueType>::remove(const KeyType& key) {
 }
 
 template <typename KeyType, typename ValueType>
-vector<pair<KeyType, ValueType>> HashMap<KeyType, ValueType>::getAll() const {
-    vector<pair<KeyType, ValueType>> allEntries;
+LinkedList<pair<KeyType, ValueType>> HashMap<KeyType, ValueType>::getAll() const {
+    LinkedList<pair<KeyType, ValueType>> allEntries;
     for (const auto& entry : table) {
         if (entry.isActive) {
-            allEntries.push_back({entry.key, entry.value});
+            allEntries.append({entry.key, entry.value});
         }
     }
     return allEntries;

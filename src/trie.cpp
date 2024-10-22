@@ -114,7 +114,6 @@ void findFileAndAddToTrie(TrieNode &root){
 
             // Check if file is a CSV
             if (isCSV(en->d_name)) {
-                cout << "CSV: " << en->d_name << endl;
                 addWordToTrie(&root, removeExtension(en->d_name));  // add to trie
             }
         }

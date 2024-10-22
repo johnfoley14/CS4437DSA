@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <functional> // std::hash
+#include "LinkedList.h"
 
 using namespace std;
 
@@ -33,7 +34,7 @@ public:
     void insert(const KeyType& key, const ValueType& value);
     bool get(const KeyType& key, ValueType& value) const;
     void remove(const KeyType& key);
-    vector<pair<KeyType, ValueType>> getAll() const;
+    LinkedList<pair<KeyType, ValueType>> getAll() const;
 };
 
 #include "HashMap.tpp"
