@@ -20,7 +20,7 @@ private:
         Entry() : key(), value(), isActive(false), isDeleted(false) {}
     };
 
-    DynamicArray<Entry> table;
+    DynamicArray<Entry>* table;
     size_t tableSize;
     size_t numElements;
 
