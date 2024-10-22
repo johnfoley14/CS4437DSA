@@ -76,9 +76,9 @@ void DynamicArray<T>::resize()
 }
 
 template <typename T>
-void DynamicArray<T>::printElements(int limit) const
+void DynamicArray<T>::printElements(int start, int end) const
 {
-  for (int i = 0; i < size && i < limit; i++)
+  for (int i = start; i < size && i < end; i++)
   {
     std::cout << data[i] << std::endl;
   }
