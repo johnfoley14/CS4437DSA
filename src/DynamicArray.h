@@ -16,6 +16,7 @@ public:
     DynamicArray(int capacity = 1000000);
     ~DynamicArray();
     void add(const T &value);
+    T get(int index);
     void insert(int index, const T& value);
     void resize();
     void printElements() const;

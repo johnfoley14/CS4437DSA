@@ -2,7 +2,6 @@
 
 template <typename T>
 DynamicArray<T>::DynamicArray(int capacity) {
-  cout << "Capacity: " << capacity << endl;
   this->capacity = capacity;
   this->size = 0;
   this->data = new T[capacity];
@@ -21,6 +20,34 @@ void DynamicArray<T>::add(const T& value) {
   data[size++] = value;
 }
 
+template <typename T>
+T DynamicArray<T>::get(int index) {
+  if (index < 0 || index >= size) {
+    static T defaultValue = T();
+    return defaultValue;
+  }
+  return data[index];
+}
+
+template <typename T>
+void DynamicArray<T>::insert(int index, const T& value) {
+  if (index < 0) {
+    throw std::out_of_range("Index cannot be negative");
+  }
+  if (index >= size) {
+    // Auto-resize and fill in gaps with default values if index exceeds current
+    // size
+    if (index >= capacity) {
+      while (index >= capacity) {
+        resize();
+      }
+    }
+    for (int i = size; i <= index; ++i) {
+      data[i] = T();  // Initialize new elements with default constructor
+    }
+    size = index + 1;  // Adjust size to include the new index
+  }
+}
 template <typename T>
 void DynamicArray<T>::resize() {
   capacity *= 2;
