@@ -14,16 +14,23 @@ WordsInBook countWordsInBook(string filePath) {
 
   // Maxing to 10 words for testing
   while (getline(file, line)) {
+    cout << "line" << endl;
     LinkedList<string> words = sanitizeLine(line);
 
+    cout << "Got line and sanitized" << endl;
     // Read each word from the line
     for (const string& word : words) {
+      cout << "In for loop" << endl;
+      cout << word << endl;
       WordMetadata* wordMeta = new WordMetadata();
       if (wordCounts.get(word, wordMeta)) {
+        cout << "Word found" << endl;
         wordMeta->count++;
+        cout << "Added to count" << endl;
         wordMeta->positions.append(position);
         wordCounts.insert(word, wordMeta);  // updating existing
       } else {
+        cout << "No word found" << endl;
         wordMeta->count = 1;
         wordMeta->positions.append(position);
         wordCounts.insert(word, wordMeta);  // inserting new
@@ -31,9 +38,18 @@ WordsInBook countWordsInBook(string filePath) {
       totalCount++;
       position++;
     }
+    cout << "AAAAAAAAAAAAAAAAAA" << endl;
   }
+  cout << "Opeing word counts" << endl;
+  WordMetadata* myWordMeta = new WordMetadata();
+  wordCounts.get("the", myWordMeta);
+  cout << "Word count: " << myWordMeta->count << endl;
+  cout << "Total count: " << totalCount << endl;
+
+  cout << "Exiting" << endl;
 
   file.close();
+  cout << "File closed" << endl;
   return {totalCount, wordCounts};
 }
 

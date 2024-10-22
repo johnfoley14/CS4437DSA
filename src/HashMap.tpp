@@ -6,8 +6,7 @@
 const double MAX_LOAD_FACTOR = 0.7;
 
 template <typename KeyType, typename ValueType>
-HashMap<KeyType, ValueType>::HashMap(size_t size) : tableSize(size), numElements(0) {
-    table.resize();
+HashMap<KeyType, ValueType>::HashMap(size_t size) : table(size), tableSize(size), numElements(0) {
 }
 
 template <typename KeyType, typename ValueType>
@@ -88,11 +87,15 @@ void HashMap<KeyType, ValueType>::insert(const KeyType& key, const ValueType& va
 
 template <typename KeyType, typename ValueType>
 bool HashMap<KeyType, ValueType>::get(const KeyType& key, ValueType& value) const {
+    cout << "Entered get" << endl;
     size_t index = hashFunction(key);
     size_t originalIndex = index;
     size_t i = 0;
 
+    cout << "Table size: " << table.getSize() << endl;
+
     while (table[index].isActive || table[index].isDeleted) {
+        cout << "table is active" << endl;
         if (table[index].isActive && table[index].key == key) {
             value = table[index].value; // Set the value
             return true;
