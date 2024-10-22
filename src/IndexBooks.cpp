@@ -9,9 +9,10 @@ WordsInBook countWordsInBook(string filePath)
     return {};
   }
 
-  map<string, WordMetadata> wordCounts;
+  HashMap<string, WordMetadata> wordCounts;
   string line, word;
   int totalCount = 0;
+  int position = 0;
 
   // Maxing to 10 words for testing
   while (getline(file, line))
@@ -19,11 +20,23 @@ WordsInBook countWordsInBook(string filePath)
     LinkedList<string> words = sanitizeLine(line);
 
     // Read each word from the line
-    for (string word : words)
+    for (const string& word : words)
     {
-      wordCounts[word].count++;
-      wordCounts[word].positions.push_back(totalCount);
-      totalCount++;
+        WordMetadata wordMeta;
+        if (wordCounts.get(word, wordMeta))
+        {
+            wordMeta.count++;
+            wordMeta.positions.push_back(position);
+            wordCounts.insert(word, wordMeta); // updating existing
+        }
+        else
+        {
+            wordMeta.count = 1;
+            wordMeta.positions.push_back(position);
+            wordCounts.insert(word, wordMeta); // inserting new
+        }
+        totalCount++;
+        position++;
     }
   }
 
@@ -102,38 +115,45 @@ void addPreviousRows(string filePath, string bookId)
 
 void updateWordCSVs(string bookId, WordsInBook words)
 {
-  for (const auto &entry : words.data)
-  {
-    string filePath = "../index/words/" + entry.first + ".csv";
-
-    if (bookId != "1")
+    vector<pair<string, WordMetadata>> entries = words.data.getAll(); // change me to LinkedList
+    for (const auto& entry : entries)
     {
-      addPreviousRows(filePath, bookId);
+        string filePath = "../index/words/" + entry.first + ".csv";
+
+        if (bookId != "1")
+        {
+            addPreviousRows(filePath, bookId);
+        }
+
+        string row = bookId + ',' + to_string(entry.second.count);
+        row += ",\"[";
+        for (size_t i = 0; i < entry.second.positions.size(); i++)
+        {
+            row += to_string(entry.second.positions[i]);
+            if (i < entry.second.positions.size() - 1)
+            {
+                row += ',';
+            }
+        }
+        row += "]\"";
+        appendToCSV(filePath, row);
     }
 
-    string row = bookId + ',' + to_string(entry.second.count);
-    row += ",\"[";
-    for (int i = 0; i < entry.second.positions.size(); i++)
+    // Add book to word CSVs that the book didn't contain that word
+    string emptyRow = bookId + ',';
+    for (const auto& entry : fs::directory_iterator("../index/words/"))
     {
-      row += to_string(entry.second.positions[i]) + ',';
+        if (fs::is_regular_file(entry.status()))
+        {
+            string word = entry.path().stem().string();
+            WordMetadata dummyValue;
+            // need to check if the word is already in the book with dummyValue
+            if (!words.data.get(word, dummyValue))
+            {
+                appendToCSV(entry.path().string(), emptyRow);
+            }
+        }
     }
-    row.pop_back();
-    row += "]\"";
-    appendToCSV(filePath, row);
-  }
-
-  // Add book to word csvs that the book didn't have that word
-  string emptyRow = bookId + ',';
-  for (const auto &entry : fs::directory_iterator("../index/words/"))
-  {
-    if (fs::is_regular_file(entry.status()))
-    {
-      if (words.data.find(entry.path().stem().string()) == words.data.end())
-      {
-        appendToCSV(entry.path().string(), emptyRow);
-      }
-    }
-  }
 }
 
 int countBooksWithWord(string filePath)
@@ -351,6 +371,7 @@ void indexBook(string bookName)
 
 void indexAllBooks()
 {
+  auto start = chrono::high_resolution_clock::now();
   createIndexDirs();
   if (!fs::exists("../books/"))
   {
@@ -377,4 +398,8 @@ void indexAllBooks()
   appendToCSV("../index/Overview.csv", row);
   updateWordMetadata();
   addRelevanceScores();
+  auto end = chrono::high_resolution_clock::now();
+  auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+
+  cout << "Indexing all books took " << duration.count() << " milliseconds." << endl;
 }

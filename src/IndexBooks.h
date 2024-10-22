@@ -13,6 +13,7 @@
 #include "ProcessInput.h"
 #include "RelevanceFunction.h"
 #include "DynamicArray.h"
+#include "HashMap.h"
 
 namespace fs = filesystem;
 
@@ -25,7 +26,7 @@ struct WordMetadata
 struct WordsInBook
 {
   int totalWords;
-  map<string, WordMetadata> data;
+  HashMap<string, WordMetadata> data;
 };
 
 WordsInBook countWordsInBook(string filePath);
