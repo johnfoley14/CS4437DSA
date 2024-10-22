@@ -7,13 +7,12 @@ const double MAX_LOAD_FACTOR = 0.7;
 
 template <typename KeyType, typename ValueType>
 HashMap<KeyType, ValueType>::HashMap(size_t size) : tableSize(size), numElements(0) {
-    table.resize(tableSize);
+    table.resize();
 }
 
 template <typename KeyType, typename ValueType>
 HashMap<KeyType, ValueType>::~HashMap() {
     // will be needed when we use our LinkedList instead of vector
-    
 }
 
 template <typename KeyType, typename ValueType>
@@ -47,17 +46,18 @@ size_t HashMap<KeyType, ValueType>::findSlot(const KeyType& key) const {
 
 template <typename KeyType, typename ValueType>
 void HashMap<KeyType, ValueType>::rehash() {
-    vector<Entry> oldTable = table;
+    DynamicArray<Entry> oldTable = table;
 
-    tableSize *= 2;
-    table.resize(tableSize);
-    for (auto& entry : table) {
-        entry = Entry(); // reset all entries
+    table.resize();
+    for (int i = 0; i < table.getSize(); ++i) {
+        table[i] = Entry(); // Reset each entry
     }
 
     numElements = 0;
 
-    for (const auto& entry : oldTable) {
+    // Reinsert all active entries from oldTable
+    for (int i = 0; i < oldTable.getSize(); ++i) {
+        const auto& entry = oldTable[i];
         if (entry.isActive) {
             insert(entry.key, entry.value);
         }
@@ -135,7 +135,8 @@ void HashMap<KeyType, ValueType>::remove(const KeyType& key) {
 template <typename KeyType, typename ValueType>
 LinkedList<pair<KeyType, ValueType>> HashMap<KeyType, ValueType>::getAll() const {
     LinkedList<pair<KeyType, ValueType>> allEntries;
-    for (const auto& entry : table) {
+    for (int i = 0; i < table.getSize(); ++i) {
+        const auto& entry = table[i];
         if (entry.isActive) {
             allEntries.append({entry.key, entry.value});
         }

@@ -18,6 +18,7 @@ public:
     void printElements() const;
     int getSize() const;
     bool operator==(const DynamicArray<T>& other) const;
+    T& operator[](int index) const;
 };
 
 #include "DynamicArray.tpp"

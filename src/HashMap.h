@@ -4,6 +4,7 @@
 #include <vector>
 #include <functional> // std::hash
 #include "LinkedList.h"
+#include "DynamicArray.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ private:
         Entry() : key(), value(), isActive(false), isDeleted(false) {}
     };
 
-    vector<Entry> table;
+    DynamicArray<Entry> table;
     size_t tableSize;
     size_t numElements;
 

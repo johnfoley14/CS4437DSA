@@ -60,5 +60,13 @@ bool DynamicArray<T>::operator==(const DynamicArray<T>& other) const {
     return true;
 }
 
+template <typename T>
+T& DynamicArray<T>::operator[](int index) const {
+    if (index < 0 || index >= size) {
+        throw std::out_of_range("Index out of bounds");
+    }
+    return data[index];
+}
+
 
 
