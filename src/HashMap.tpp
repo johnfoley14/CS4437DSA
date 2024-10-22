@@ -80,7 +80,7 @@ void HashMap<KeyType, ValueType>::insert(const KeyType& key,
 
   if (!table->get(index).isActive ||
       table->get(index).isDeleted) {  // available slot
-    Entry newEntry = table->get(index);
+    Entry newEntry;
     newEntry.key = key;
     newEntry.value = value;
     newEntry.isActive = true;
@@ -90,7 +90,7 @@ void HashMap<KeyType, ValueType>::insert(const KeyType& key,
 
     numElements++;
   } else {  // key already exists
-    Entry newEntry;
+    Entry newEntry = table->get(index);
     newEntry.value->count = value->count;
     newEntry.value->positions = value->positions;
     table->insert(index, newEntry);
@@ -148,11 +148,11 @@ template <typename KeyType, typename ValueType>
 LinkedList<pair<KeyType, ValueType>> HashMap<KeyType, ValueType>::getAll()
     const {
   LinkedList<pair<KeyType, ValueType>> allEntries;
+  cout << "getting size of table" << endl;
   for (int i = 0; i < table->getSize(); ++i) {
     const auto& entry = table->get(i);
-    cout << "Last line?" << endl;
-    cout << "is activr" << entry.isActive << endl;
     if (entry.isActive) {
+      cout << "Entry active" << endl;
       allEntries.append({entry.key, entry.value});
     }
   }

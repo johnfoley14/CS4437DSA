@@ -7,50 +7,35 @@ void countWordsInBook(string filePath, WordsInBook& result) {
     return;
   }
 
-  HashMap<string, WordMetadata*> wordCounts;
+  HashMap<string, WordMetadata*>* wordCounts = new HashMap<string, WordMetadata*>();
   string line, word;
   int totalCount = 0;
   int position = 0;
 
   // Maxing to 10 words for testing
   while (getline(file, line)) {
-    cout << "line" << endl;
     LinkedList<string> words = sanitizeLine(line);
 
-    cout << "Got line and sanitized" << endl;
     // Read each word from the line
     for (const string& word : words) {
-      cout << "In for loop" << endl;
-      cout << word << endl;
       WordMetadata* wordMeta = new WordMetadata();
-      if (wordCounts.get(word, wordMeta)) {
-        cout << "Word found" << endl;
+      if (wordCounts->get(word, wordMeta)) {
         wordMeta->count++;
-        cout << "Added to count" << endl;
         wordMeta->positions.append(position);
-        wordCounts.insert(word, wordMeta);  // updating existing
+        wordCounts->insert(word, wordMeta);  // updating existing
       } else {
-        cout << "No word found" << endl;
         wordMeta->count = 1;
         wordMeta->positions.append(position);
-        wordCounts.insert(word, wordMeta);  // inserting new
+        wordCounts->insert(word, wordMeta);  // inserting new
       }
       totalCount++;
       position++;
     }
-    cout << "AAAAAAAAAAAAAAAAAA" << endl;
   }
-  cout << "Opeing word counts" << endl;
   WordMetadata* myWordMeta = new WordMetadata();
-  wordCounts.get("the", myWordMeta);
-  cout << "Word count: " << myWordMeta->count << endl;
-  cout << "Total count: " << totalCount << endl;
-
-  cout << "Exiting" << endl;
 
   file.close();
-  cout << "File closed" << endl;
-  WordsInBook* newResult = new WordsInBook{totalCount, wordCounts};
+  WordsInBook* newResult = new WordsInBook{totalCount, *wordCounts};
   result = *newResult;
 }
 
@@ -115,10 +100,8 @@ void addPreviousRows(string filePath, string bookId) {
 }
 
 void updateWordCSVs(string bookId, WordsInBook& words) {
-  cout << "Getting all tings" << endl;
   LinkedList<pair<string, WordMetadata*>> entries =
       words.data.getAll();  // change me to LinkedList
-  cout << "Got all tings" << endl;
   for (const auto& entry : entries) {
     string filePath = "../index/words/" + entry.first + ".csv";
 
@@ -129,10 +112,12 @@ void updateWordCSVs(string bookId, WordsInBook& words) {
     string row = bookId + ',' + to_string(entry.second->count);
     row += ",\"[";
     int i = 0;
-    while (entry.second->positions.get(i)) {
+    // TODO add 'exists' method to LinkedList
+    while (entry.second->positions.exists(i)) {
       row += to_string(entry.second->positions.get(i)) + ',';
       i++;
     }
+    row.pop_back();
     row += "]\"";
     appendToCSV(filePath, row);
   }
@@ -331,6 +316,7 @@ void indexBook(string bookName) {
   updateWordCSVs(bookId, *words);
 
   cout << "Successfully indexed new book: " << bookName << endl;
+  delete words;
 }
 
 void indexAllBooks() {

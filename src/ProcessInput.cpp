@@ -1,7 +1,6 @@
 #include "ProcessInput.h"
 
 LinkedList<string> sanitizeLine(string str) {
-  cout << str << endl;
   string delimiters = " -—";
   LinkedList<string> result;
 

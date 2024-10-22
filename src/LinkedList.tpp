@@ -10,14 +10,14 @@ LinkedList<T>::LinkedList() {
 template <typename T>
 LinkedList<T>::LinkedList(const LinkedList<T> &other) {
   if (other.head == nullptr) {
-    head = nullptr; // The other list is empty, so set the head to nullptr
+    head = nullptr;  // The other list is empty, so set the head to nullptr
   } else {
     // Create the first node
     head = new Node<T>();
     head->data = other.head->data;
 
-    Node<T> *current = head;            // Pointer to the new list
-    Node<T> *otherCurrent = other.head; // Pointer to the other list
+    Node<T> *current = head;             // Pointer to the new list
+    Node<T> *otherCurrent = other.head;  // Pointer to the other list
 
     // Traverse the other list and copy each node
     while (otherCurrent->next != nullptr) {
@@ -60,7 +60,6 @@ T LinkedList<T>::get(int index) {
   }
 
   if (temp == nullptr) {
-    cout << "Index out of bounds" << endl;
     return T();
   }
 
@@ -77,11 +76,22 @@ T LinkedList<T>::get(int index) const {
   }
 
   if (temp == nullptr) {
-    std::cout << "Index out of bounds" << std::endl;
     return T();
   }
 
   return temp->data;
+}
+
+template <typename T>
+bool LinkedList<T>::exists(int index) const {
+  Node<T> *temp = head;
+  int i = 0;
+  while (temp != nullptr && i < index) {
+    temp = temp->next;
+    i++;
+  }
+
+  return temp != nullptr;
 }
 
 // Prepend a node at the beginning

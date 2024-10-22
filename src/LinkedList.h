@@ -19,6 +19,7 @@ class LinkedList {
   LinkedList();
   LinkedList(const LinkedList<T> &other);
   void append(T value);
+  bool exists(int index) const;
   void prepend(T value);
   void deleteByValue(T value);
   void display();

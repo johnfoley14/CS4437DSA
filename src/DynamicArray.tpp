@@ -9,6 +9,7 @@ DynamicArray<T>::DynamicArray(int capacity) {
 
 template <typename T>
 DynamicArray<T>::~DynamicArray() {
+  cout << "deleting array" << endl;
   delete[] data;
 }
 
@@ -47,7 +48,9 @@ void DynamicArray<T>::insert(int index, const T& value) {
     }
     size = index + 1;  // Adjust size to include the new index
   }
+  data[index] = value;
 }
+
 template <typename T>
 void DynamicArray<T>::resize() {
   capacity *= 2;
