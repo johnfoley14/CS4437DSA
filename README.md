@@ -54,9 +54,12 @@ ctest
     - `4`: exit the application
 
 
-   // Example Terminal Output
-   ``` sh
-   1
-   ```
+   ### Example Terminal Output
+![image](https://github.com/user-attachments/assets/ac6eb000-1ebc-4efe-a33d-9524122fc72b)
+
+
+  <img width="624" alt="Screenshot 2024-10-22 at 23 39 59" src="https://github.com/user-attachments/assets/e36f4b09-3577-42e9-b65c-7a8cdbbc3315">
+
+![image111](https://github.com/user-attachments/assets/a303d4fd-1c6b-4cda-b09d-49a89841bd09)
 
 
