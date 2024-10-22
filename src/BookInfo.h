@@ -108,9 +108,9 @@ struct BookInfo
     int fileId;                 // Unique ID for the file
     int totalWords;             // Total number of words in the file
     LinkedList<WordInfo> words; // LinkedList of WordInfo for each word searched for. Each node will include data of the word information for this file
+    string title;               // Title of the book
 
-    BookInfo(int id = 0, int total = 0)
-        : fileId(id), totalWords(total) {}
+    BookInfo(int id = 0, int total = 0, string title = "") : fileId(id), totalWords(total), title(title) {}
 };
 
 #endif

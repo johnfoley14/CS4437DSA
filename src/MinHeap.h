@@ -2,11 +2,13 @@
 #define MINHEAP_H
 
 #include <iostream>
+#include <string>
 
 struct BookScore
 {
     int id;
     float score;
+    std::string title;
 
     // Overloading the less-than operator to compare scores
     bool operator<(const BookScore &other) const

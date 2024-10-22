@@ -125,6 +125,6 @@ void MinHeap::printHeap() const
 {
     for (int i = 0; i < heapSize; i++)
     {
-        std::cout << "ID: " << heapArray[i].id << ", Score: " << heapArray[i].score << std::endl;
+        std::cout << "ID: " << heapArray[i].id << ", Score: " << heapArray[i].score << ", Title: " << heapArray[i].title << std::endl;
     }
 }
