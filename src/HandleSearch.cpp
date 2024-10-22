@@ -185,7 +185,8 @@ void printResults(MinHeap &resultsHeap)
     int startRankNum = resultsHeap.heapSize;
     while (resultsHeap.heapSize > 0)
     {
-        output += to_string(startRankNum) + ". " + resultsHeap.extractMin().title + "\n";
+        BookScore book = resultsHeap.extractMin();
+        output += to_string(startRankNum) + ". " + book.title + " Search Score: " + to_string(book.score) + "\n";
         startRankNum--;
     }
     cout << output;
