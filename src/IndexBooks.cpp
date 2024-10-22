@@ -7,7 +7,8 @@ void countWordsInBook(string filePath, WordsInBook& result) {
     return;
   }
 
-  HashMap<string, WordMetadata*>* wordCounts = new HashMap<string, WordMetadata*>();
+  HashMap<string, WordMetadata*>* wordCounts =
+      new HashMap<string, WordMetadata*>();
   string line, word;
   int totalCount = 0;
   int position = 0;
@@ -119,7 +120,7 @@ void updateWordCSVs(string bookId, WordsInBook& words) {
     }
     row.pop_back();
     row += "]\"";
-    
+
     appendToCSV(filePath, row);
   }
 
@@ -349,4 +350,125 @@ void indexAllBooks() {
 
   cout << "Indexing all books took " << duration.count() << " milliseconds."
        << endl;
+}
+
+void deleteBook(string filePath, int index) {
+  ifstream file(filePath);  // Open the input CSV file
+  if (!file.is_open()) {
+    cerr << "Unable to open file: " << filePath << endl;
+    return;
+  }
+
+  DynamicArray<string> lines;
+  string line;
+  int lineNumber = 1;
+
+  while (getline(file, line)) {
+    stringstream ss(line);
+    string bookIndex;
+
+    getline(ss, bookIndex, ',');
+
+    if (lineNumber != index) {  // If the line does not match, keep it
+      lines.add(line);
+    } else {
+      lines.add(",,");
+    }
+    lineNumber++;
+  }
+
+  file.close();
+
+  ofstream outFile(filePath, ios::trunc);
+  if (!outFile.is_open()) {
+    cerr << "Unable to open file for writing: " << filePath << endl;
+    return;
+  }
+
+  // Write all the remaining lines back to the file
+  for (int i = 0; i < lines.getSize(); i++) {
+    outFile << lines[i] << "\n";  // Add the newline back after each line
+  }
+
+  outFile.close();  // Close the file after writing
+}
+
+void deleteBookInAllFiles(int index) {
+  int filesAffected = 0;
+
+  for (const auto& entry : fs::directory_iterator("../index/words/")) {
+    if (fs::is_regular_file(entry.status())) {
+      filesAffected++;
+      deleteBook(entry.path().string(), index);
+      cout << "\rFiles Affected: " << filesAffected << flush;
+    }
+  }
+
+  for (const auto& entry : fs::directory_iterator("../index/scores/")) {
+    filesAffected++;
+    if (fs::is_regular_file(entry.status())) {
+      filesAffected++;
+      deleteBook(entry.path().string(), index);
+      cout << "\rFiles Affected: " << filesAffected << flush;
+    }
+  }
+
+  deleteBook("../index/BookMetadata.csv", index);
+}
+
+void deleteBooks() {
+  DynamicArray<pair<string, int>> indexedBooks;
+  DynamicArray<string> booksInDirectory;
+  DynamicArray<string> deletedBooks;
+
+  for (const auto& entry : fs::directory_iterator("../books/")) {
+    if (fs::is_regular_file(entry.status())) {
+      booksInDirectory.add(entry.path().stem().string());
+    }
+  }
+
+  ifstream ifile("../index/BookMetadata.csv");
+  string currentLine;
+
+  while (getline(ifile, currentLine)) {
+    stringstream ss(currentLine);
+    string bookId;
+    string bookName;
+
+    getline(ss, bookId, ',');
+    getline(ss, bookName, ',');
+
+    indexedBooks.add({bookName, stoi(bookId)});
+  }
+
+  for (int i = 0; i < indexedBooks.getSize(); i++) {
+    bool bookDeleted = true;
+    for (int j = 0; j < booksInDirectory.getSize(); j++) {
+      if (indexedBooks[i].first == booksInDirectory[j]) {
+        bookDeleted = false;
+      }
+    }
+
+    if (bookDeleted) {
+      cout << "Deleting indexing of book: " << indexedBooks[i].first << endl;
+
+      deleteBookInAllFiles(indexedBooks[i].second);
+    }
+  }
+
+  updateWordMetadata();
+  int totalBooks = 0;
+  for (const auto& entry : fs::directory_iterator("../books/")) {
+    if (fs::is_regular_file(entry.status())) {
+      indexBook(entry.path().stem().string());
+      totalBooks++;
+    }
+  }
+
+  if (fs::exists("../index/Overview.csv")) {
+    fs::remove("../index/Overview.csv");
+  }
+
+  string row = "totalBooks," + to_string(totalBooks);
+  appendToCSV("../index/Overview.csv", row);
 }

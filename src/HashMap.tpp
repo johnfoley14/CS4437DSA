@@ -1,5 +1,5 @@
 #include <iostream>
-#include <vector>
+
 
 #include "HashMap.h"
 
@@ -14,13 +14,15 @@ HashMap<KeyType, ValueType>::HashMap(size_t size)
 template <typename KeyType, typename ValueType>
 HashMap<KeyType, ValueType>::~HashMap() {
   delete table;
-  // will be needed when we use our LinkedList instead of vector
 }
 
 template <typename KeyType, typename ValueType>
 size_t HashMap<KeyType, ValueType>::hashFunction(const KeyType& key) const {
-  std::hash<KeyType> hashFn;  // change me to custom/ md-5
-  return hashFn(key) % tableSize;
+    size_t hash = 0;
+    for (char c : key) {
+        hash = (hash * 31) + c; // 31, prime
+    }
+    return hash % tableSize;
 }
 
 template <typename KeyType, typename ValueType>

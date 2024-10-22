@@ -20,7 +20,7 @@ public:
     T get(int index);
     void insert(int index, const T &value);
     void resize();
-    void printElements(int limit = 10) const;
+    void printElements(int start = 0, int end = 10) const;
     int getSize() const;
     bool operator==(const DynamicArray<T> &other) const;
     T &operator[](int index);

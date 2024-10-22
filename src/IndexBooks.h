@@ -37,5 +37,6 @@ void indexBook(string bookName);
 void updateWordCSVs(string bookId, WordsInBook& words);
 int countBooksWithWord(string filePath);
 void updateWordMetadata();
+void deleteBooks();
 
 #endif
