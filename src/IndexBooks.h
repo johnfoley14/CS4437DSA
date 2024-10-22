@@ -29,12 +29,12 @@ struct WordsInBook
   HashMap<string, WordMetadata*> data;
 };
 
-WordsInBook countWordsInBook(string filePath);
+void countWordsInBook(string filePath, WordsInBook&  result);
 string appendToBookMetadata(string bookName, int totalWords);
 void appendToCSV(string filePath, string row);
 void indexAllBooks();
 void indexBook(string bookName);
-void updateWordCSVs(string bookId, WordsInBook words);
+void updateWordCSVs(string bookId, WordsInBook& words);
 int countBooksWithWord(string filePath);
 void updateWordMetadata();
 

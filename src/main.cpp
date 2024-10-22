@@ -27,6 +27,7 @@ void clearScreen() {
 int main() {
   string choice;
   TrieNode root;
+  WordsInBook* wordsInBook = new WordsInBook;
   bool quit = false;
   // clearScreen();
 
@@ -39,7 +40,8 @@ int main() {
       case '0':
         countWordsInBook(
             "/home/djk/Development/ise/srp-cs4437/DSA/cpp/git/CS4437DSA/books/"
-            "A Room with a View_2641.txt");
+            "A Room with a View_2641.txt",
+            *wordsInBook);
         break;
       case '1':
         cout << "You selected: 1 - Reload indexed books" << endl;

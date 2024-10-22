@@ -1,10 +1,10 @@
 #include "IndexBooks.h"
 
-WordsInBook countWordsInBook(string filePath) {
+void countWordsInBook(string filePath, WordsInBook& result) {
   ifstream file(filePath);
   if (!file.is_open()) {
     cerr << "Error: Could not open the file!" << endl;
-    return {};
+    return;
   }
 
   HashMap<string, WordMetadata*> wordCounts;
@@ -50,7 +50,8 @@ WordsInBook countWordsInBook(string filePath) {
 
   file.close();
   cout << "File closed" << endl;
-  return {totalCount, wordCounts};
+  WordsInBook* newResult = new WordsInBook{totalCount, wordCounts};
+  result = *newResult;
 }
 
 void appendToCSV(string filePath, string row) {
@@ -113,9 +114,11 @@ void addPreviousRows(string filePath, string bookId) {
   }
 }
 
-void updateWordCSVs(string bookId, WordsInBook words) {
+void updateWordCSVs(string bookId, WordsInBook& words) {
+  cout << "Getting all tings" << endl;
   LinkedList<pair<string, WordMetadata*>> entries =
       words.data.getAll();  // change me to LinkedList
+  cout << "Got all tings" << endl;
   for (const auto& entry : entries) {
     string filePath = "../index/words/" + entry.first + ".csv";
 
@@ -319,12 +322,13 @@ void indexBook(string bookName) {
 
   string path = "../books/" + bookName + ".txt";
 
-  WordsInBook words = countWordsInBook(path);
+  WordsInBook* words = new WordsInBook;
+  countWordsInBook(path, *words);
 
   cout << "Finished reading in book: " << bookName << endl;
 
-  string bookId = appendToBookMetadata(bookName, words.totalWords);
-  updateWordCSVs(bookId, words);
+  string bookId = appendToBookMetadata(bookName, words->totalWords);
+  updateWordCSVs(bookId, *words);
 
   cout << "Successfully indexed new book: " << bookName << endl;
 }
