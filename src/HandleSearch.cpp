@@ -1,4 +1,5 @@
 #include "HandleSearch.h"
+#include <chrono>
 
 using namespace std;
 
@@ -19,7 +20,7 @@ int *parsePositions(const string &posStr, int count)
 }
 
 // Main function that allocates BookInfo array and updates the BookInfo with CSV data
-BookInfo *processCSVFiles(const string *words, int length, int fileCount)
+BookInfo *processCSVFiles(const string *words, int length, int fileCount, DynamicArray<string> &stopwords)
 {
     // allocate array of BookInfo, where the array size is the max number of files we have
     // the fileID will be used as the index in the array
@@ -32,6 +33,10 @@ BookInfo *processCSVFiles(const string *words, int length, int fileCount)
         if (words[i] == "NOT")
         {
             notFlag = true;
+            continue;
+        }
+        if (isStopWord(words[i], stopwords))
+        {
             continue;
         }
 
@@ -193,7 +198,7 @@ void printResults(MinHeap &resultsHeap)
     return;
 }
 
-void handleSearch(string choice)
+void handleSearch(string choice, DynamicArray<string> &stopwords)
 {
     int wordCount = countWords(choice);
 
@@ -226,8 +231,10 @@ void handleSearch(string choice)
 
         totalBooks = stoi(value);
     }
-    BookInfo *searchBookInfos = processCSVFiles(output, wordCount, totalBooks);
+    BookInfo *searchBookInfos = processCSVFiles(output, wordCount, totalBooks, stopwords);
     MinHeap heap(50);
+    auto start = chrono::high_resolution_clock::now();
+
     for (int i = 0; i < totalBooks; i++)
     {
         // if the book has no occurences of the searched words, we skip it
@@ -250,6 +257,10 @@ void handleSearch(string choice)
             }
         }
     }
+
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+    cout << "Time taken by loop: " << elapsed.count() << " seconds" << endl;
     printResults(heap);
     return;
 }

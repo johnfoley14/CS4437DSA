@@ -2,17 +2,19 @@
 #include "BookInfo.h"
 #include "HandleSearch.h"
 #include "RelevanceFunction.h"
+#include "DynamicArray.h"
 
 string words[] = {"test_dummy_data", "test_dummy_data2"};
 int length = 2;     // Number of words searched for
 int fileCount = 10; // this should be the max number of files we have (ie biggest file ID)
 // Call the function to process CSV files and get the array of BookInfo
-BookInfo *bookInfos = processCSVFiles(words, length, fileCount);
+DynamicArray<string> stopwords = getStopWords();
+BookInfo *bookInfos = processCSVFiles(words, length, fileCount, stopwords);
 
 // Test case to make sure the BookInfo array is not null
 TEST(ProcessCSVFilesTest, BookInfosNotNull)
 {
-    ASSERT_NE(processCSVFiles(words, length, fileCount), nullptr);
+    ASSERT_NE(processCSVFiles(words, length, fileCount, stopwords), nullptr);
 }
 
 // Test case to check if the bookInfos array is allocated correctly

@@ -1,14 +1,15 @@
 #ifndef DYNAMICARRAY_H
 #define DYNAMICARRAY_H
 
-#include <iostream> 
+#include <iostream>
 
 using namespace std;
 
 template <typename T>
-class DynamicArray {
+class DynamicArray
+{
 private:
-    T* data;
+    T *data;
     int size;
     int capacity;
 
@@ -17,15 +18,15 @@ public:
     ~DynamicArray();
     void add(const T &value);
     T get(int index);
-    void insert(int index, const T& value);
+    void insert(int index, const T &value);
     void resize();
     void printElements(int limit = 10) const;
     int getSize() const;
-    bool operator==(const DynamicArray<T>& other) const;
-    T& operator[](int index);
-    const T& operator[](int index) const;
+    bool operator==(const DynamicArray<T> &other) const;
+    T &operator[](int index);
+    const T &operator[](int index) const;
 };
 
 #include "DynamicArray.tpp"
 
-#endif 
+#endif
